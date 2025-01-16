@@ -28,11 +28,13 @@ class ExpenseTracker(ctk.CTk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=10)
 
+        # Header Frame
         self.header_frame = ctk.CTkFrame(self)
         self.header_frame.grid(row=0, column=1, sticky="nsew", padx=2, pady=2)
         self.header_frame.grid_rowconfigure(0, weight=1)
         self.header_frame.grid_columnconfigure(0, weight=1)
 
+        # Menu Frame
         self.menu_frame = ctk.CTkFrame(self, fg_color="#008f11")
         self.menu_frame.grid(row=0, column=0, sticky="nsew", padx=2, pady=2, rowspan=2)
         for i in range(7):
@@ -42,6 +44,7 @@ class ExpenseTracker(ctk.CTk):
                 self.menu_frame.grid_rowconfigure(i, weight=3)
         self.menu_frame.grid_columnconfigure(0, weight=1)
 
+        # Content Frame
         self.content_frame = ctk.CTkFrame(self)
         self.content_frame.grid(row=1, column=1, sticky="nsew", padx=2, pady=2)
         self.content_frame.grid_rowconfigure(0, weight=1)
@@ -57,6 +60,7 @@ class ExpenseTracker(ctk.CTk):
         header = ctk.CTkLabel(self.menu_frame, text="", font=("Helvetica", 25))
         header.grid(row=0, column=0, padx=20, pady=20)
 
+        # Menu Frame Buttons
         dashboard_button = ctk.CTkButton(self.menu_frame, text="Dashboard", font=("Helvetica", 20), fg_color="transparent", hover_color="#00690c", command=self.dashboard_page)
         dashboard_button.grid(row=1, column=0, padx=0, pady=30)
 
@@ -77,21 +81,19 @@ class ExpenseTracker(ctk.CTk):
         
         self.clear_content_frame()
 
-        # budget_frame = ctk.CTkFrame(self.content_frame)
-        # budget_frame.grid(row=0, column=0, columnspan=2)
-
+        # Incomes Frame
         incomes_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
         incomes_frame.grid(row=1, column=0)
 
+        # Expenses Frame
         expenses_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
         expenses_frame.grid(row=1, column=1)
 
-        # self.budget_label = ctk.CTkLabel(budget_frame, text="Balance\n\n"+"2000$", font=("Helvetica", 25)).grid(row=0, column=0)
         balance_label = ctk.CTkLabel(self.content_frame, text="Balance\n\n"+"2000$", font=("Helvetica", 25)).grid(row=0, column=0, columnspan=2)
-        # budget_label = ctk.CTkLabel(self.content_frame, text="2000$", font=("Helvetica", 20)).grid(row=1, column=0, columnspan=2)
 
         label = ctk.CTkLabel(incomes_frame, text="Latest Incomes\n", font=("Helvetica", 20)).grid(row=0, column=0)
         
+        # Income Records
         money = 0 # Delete later
         for i in range(3):
             money += 100
@@ -99,6 +101,7 @@ class ExpenseTracker(ctk.CTk):
 
         label = ctk.CTkLabel(expenses_frame, text="Latest Expenses\n", font=("Helvetica", 20)).grid(row=0, column=0)
 
+        # Expense Records
         money = 0 # Delete later
         for i in range(3):
             money += 100

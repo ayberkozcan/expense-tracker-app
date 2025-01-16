@@ -15,11 +15,13 @@ def incomes_page(self):
 
     net_income = ctk.CTkLabel(self.content_frame, text="2000$", text_color="darkgreen", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
 
+    # Top Frame
     top_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
     top_frame.grid(row=1, column=0, columnspan=2, padx=20, sticky="nsew")
     top_frame.grid_columnconfigure(0, weight=1)
     top_frame.grid_columnconfigure(1, weight=1)
 
+    # Chart Frame
     chart_frame = ctk.CTkFrame(top_frame, fg_color="transparent")
     chart_frame.grid(row=0, column=0, sticky="w")
 
@@ -38,27 +40,26 @@ def incomes_page(self):
 
     canvas.get_tk_widget().grid(row=0, column=0, pady=(10, 5), columnspan=4, sticky="nsew")
     
+    # Summary Frame
     summary_frame = ctk.CTkScrollableFrame(top_frame, fg_color="transparent")
     summary_frame.grid(row=0, column=1, sticky="nsew")
 
     summary_header = ctk.CTkLabel(summary_frame, text="Summary (Last 10)", font=("Helvetica", 20)).grid(row=0, column=0, pady=(5, 20), sticky="w")
     
+    # Last 10 Records in Summary Frame
     money = 0 # Delete later
     for i in range(10):
         money += 100
         label = ctk.CTkLabel(summary_frame, text="*"+str(money).join(" $")+" (Category)").grid(row=i+1, column=0, pady=5, sticky="w")
         details = ctk.CTkButton(summary_frame, text="Details", width=20).grid(row=i+1, column=1)
 
-
-    # periods_frame = ctk.CTkFrame(chart_frame, fg_color="transparent")
-    # periods_frame.grid(row=1, column=0)
-
+    # Period Buttons
     this_week_button = ctk.CTkButton(chart_frame, text="This Week", width=40).grid(row=1, column=0)
     this_month_button = ctk.CTkButton(chart_frame, text="This Month", width=40).grid(row=1, column=1)
     this_year_button = ctk.CTkButton(chart_frame, text="This Year", width=40).grid(row=1, column=2)
     all_time_button = ctk.CTkButton(chart_frame, text="All Time", width=40).grid(row=1, column=3)
 
-
+    # Footer Frame
     footer_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
     footer_frame.grid(row=2, column=0, columnspan=2, padx=20, pady=10, sticky="nsew")
     footer_frame.grid_columnconfigure(0, weight=1)
@@ -69,6 +70,7 @@ def incomes_page(self):
 
     categories_selectBox = ctk.CTkOptionMenu(footer_frame, values=categories, variable=selected_category).grid(row=0, column=0, pady=5, sticky="w")
 
+    # Left Footer Frame
     records_by_categories_frame = ctk.CTkScrollableFrame(footer_frame, fg_color="transparent")
     records_by_categories_frame.grid(row=1, column=0, sticky="nsew")
 
@@ -80,6 +82,7 @@ def incomes_page(self):
 
     label = ctk.CTkLabel(footer_frame, text="Total Income by Categories "+"This Week", font=("Helvetica", 15)).grid(row=0, column=1, sticky="w")
 
+    # Right Footer Frame
     income_by_categories_frame = ctk.CTkScrollableFrame(footer_frame, fg_color="transparent")
     income_by_categories_frame.grid(row=1, column=1, sticky="nsew")
 

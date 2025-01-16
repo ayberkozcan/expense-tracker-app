@@ -38,7 +38,7 @@ def incomes_page(self):
     canvas = FigureCanvasTkAgg(fig, master=chart_frame)
     canvas.draw()
 
-    canvas.get_tk_widget().grid(row=0, column=0, pady=(10, 5), columnspan=4, sticky="nsew")
+    canvas.get_tk_widget().grid(row=1, column=0, pady=(10, 5), columnspan=4, sticky="nsew")
     
     # Summary Frame
     summary_frame = ctk.CTkScrollableFrame(top_frame, fg_color="transparent")
@@ -54,10 +54,10 @@ def incomes_page(self):
         details = ctk.CTkButton(summary_frame, text="Details", width=20).grid(row=i+1, column=1)
 
     # Period Buttons
-    this_week_button = ctk.CTkButton(chart_frame, text="This Week", width=40).grid(row=1, column=0)
-    this_month_button = ctk.CTkButton(chart_frame, text="This Month", width=40).grid(row=1, column=1)
-    this_year_button = ctk.CTkButton(chart_frame, text="This Year", width=40).grid(row=1, column=2)
-    all_time_button = ctk.CTkButton(chart_frame, text="All Time", width=40).grid(row=1, column=3)
+    this_week_button = ctk.CTkButton(chart_frame, text="This Week", width=40).grid(row=0, column=0)
+    this_month_button = ctk.CTkButton(chart_frame, text="This Month", width=40).grid(row=0, column=1)
+    this_year_button = ctk.CTkButton(chart_frame, text="This Year", width=40).grid(row=0, column=2)
+    all_time_button = ctk.CTkButton(chart_frame, text="All Time", width=40).grid(row=0, column=3)
 
     # Footer Frame
     footer_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")

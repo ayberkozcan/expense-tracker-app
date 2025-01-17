@@ -46,10 +46,10 @@ def reports_page(self):
     canvas.get_tk_widget().grid(row=1, column=0, pady=(10, 5), columnspan=4, sticky="nsew")
 
     # Period Buttons
-    this_week_button = ctk.CTkButton(chart_frame, text="This Week", width=40).grid(row=0, column=0)
-    this_month_button = ctk.CTkButton(chart_frame, text="This Month", width=40).grid(row=0, column=1)
-    this_year_button = ctk.CTkButton(chart_frame, text="This Year", width=40).grid(row=0, column=2)
-    all_time_button = ctk.CTkButton(chart_frame, text="All Time", width=40).grid(row=0, column=3)
+    this_week_button = ctk.CTkButton(chart_frame, text="This Week", width=40).grid(row=0, column=0, sticky="w")
+    this_month_button = ctk.CTkButton(chart_frame, text="This Month", width=40).grid(row=0, column=1, sticky="")
+    this_year_button = ctk.CTkButton(chart_frame, text="This Year", width=40).grid(row=0, column=2, sticky="")
+    all_time_button = ctk.CTkButton(chart_frame, text="All Time", width=40).grid(row=0, column=3, sticky="e")
 
     # Summary Frame
     summary_frame = ctk.CTkScrollableFrame(top_frame, fg_color="transparent")
@@ -61,5 +61,40 @@ def reports_page(self):
     money = 0 # Delete later
     for i in range(10):
         money += 100
-        label = ctk.CTkLabel(summary_frame, text="*"+str(money).join(" $")+" (Category)").grid(row=i+1, column=0, pady=5, sticky="w")
+        label = ctk.CTkLabel(summary_frame, text="*"+str(money).join(" $")+" (Income / Expense)").grid(row=i+1, column=0, pady=5, sticky="w")
         details = ctk.CTkButton(summary_frame, text="Details", width=20).grid(row=i+1, column=1)
+
+    # Footer Frame
+    footer_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
+    footer_frame.grid(row=3, column=0, columnspan=2, padx=20, pady=10, sticky="nsew")
+    footer_frame.grid_columnconfigure(0, weight=1)
+    footer_frame.grid_columnconfigure(1, weight=1)
+
+    label = ctk.CTkLabel(footer_frame, text="Total Expense "+"This Week", font=("Helvetica", 15)).grid(row=0, column=0, sticky="w")
+
+    label = ctk.CTkLabel(footer_frame, text="Max Income & Expense by Categories "+"This Week", font=("Helvetica", 15)).grid(row=0, column=1, sticky="w")
+
+    categories = ["All Categories", "Housing", "Food", "Transportation", "Healthcare", "Entertainment"]
+    selected_category = ctk.StringVar(value=categories[0])
+
+    categories_selectBox = ctk.CTkOptionMenu(footer_frame, values=categories, variable=selected_category).grid(row=1, column=1, pady=15, sticky="w")
+
+    # Left Footer Frame
+    records_by_categories_frame = ctk.CTkFrame(footer_frame, fg_color="transparent")
+    records_by_categories_frame.grid(row=2, column=0, sticky="nsew")
+
+    max_income_label = ctk.CTkLabel(records_by_categories_frame, text="Max Income: "+str(money)+"$")
+    max_income_label.grid(row=0, column=0, sticky="w")
+
+    max_expense_label = ctk.CTkLabel(records_by_categories_frame, text="Max Expense: "+str(money)+"$")
+    max_expense_label.grid(row=1, column=0, sticky="w")
+
+    # Right Footer Frame
+    expense_by_categories_frame = ctk.CTkFrame(footer_frame, fg_color="transparent")
+    expense_by_categories_frame.grid(row=2, column=1, sticky="nsew")
+
+    max_income_label = ctk.CTkLabel(expense_by_categories_frame, text="Max Income: "+str(money)+"$")
+    max_income_label.grid(row=0, column=0, sticky="w")
+
+    max_expense_label = ctk.CTkLabel(expense_by_categories_frame, text="Max Expense: "+str(money)+"$")
+    max_expense_label.grid(row=1, column=0, sticky="w")

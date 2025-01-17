@@ -54,10 +54,10 @@ def incomes_page(self):
         details = ctk.CTkButton(summary_frame, text="Details", width=20).grid(row=i+1, column=1)
 
     # Period Buttons
-    this_week_button = ctk.CTkButton(chart_frame, text="This Week", width=40).grid(row=0, column=0)
-    this_month_button = ctk.CTkButton(chart_frame, text="This Month", width=40).grid(row=0, column=1)
-    this_year_button = ctk.CTkButton(chart_frame, text="This Year", width=40).grid(row=0, column=2)
-    all_time_button = ctk.CTkButton(chart_frame, text="All Time", width=40).grid(row=0, column=3)
+    this_week_button = ctk.CTkButton(chart_frame, text="This Week", width=40).grid(row=0, column=0, sticky="w")
+    this_month_button = ctk.CTkButton(chart_frame, text="This Month", width=40).grid(row=0, column=1, sticky="")
+    this_year_button = ctk.CTkButton(chart_frame, text="This Year", width=40).grid(row=0, column=2, sticky="")
+    all_time_button = ctk.CTkButton(chart_frame, text="All Time", width=40).grid(row=0, column=3, sticky="e")
 
     # Footer Frame
     footer_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")

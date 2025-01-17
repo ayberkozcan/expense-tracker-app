@@ -41,10 +41,10 @@ def expenses_page(self):
     canvas.get_tk_widget().grid(row=1, column=0, pady=(10, 5), columnspan=4, sticky="nsew")
     
     # Period Buttons
-    this_week_button = ctk.CTkButton(chart_frame, text="This Week", width=40).grid(row=0, column=0)
-    this_month_button = ctk.CTkButton(chart_frame, text="This Month", width=40).grid(row=0, column=1)
-    this_year_button = ctk.CTkButton(chart_frame, text="This Year", width=40).grid(row=0, column=2)
-    all_time_button = ctk.CTkButton(chart_frame, text="All Time", width=40).grid(row=0, column=3)
+    this_week_button = ctk.CTkButton(chart_frame, text="This Week", width=40).grid(row=0, column=0, sticky="w")
+    this_month_button = ctk.CTkButton(chart_frame, text="This Month", width=40).grid(row=0, column=1, sticky="")
+    this_year_button = ctk.CTkButton(chart_frame, text="This Year", width=40).grid(row=0, column=2, sticky="")
+    all_time_button = ctk.CTkButton(chart_frame, text="All Time", width=40).grid(row=0, column=3, sticky="e")
 
     # Summary Frame
     summary_frame = ctk.CTkScrollableFrame(top_frame, fg_color="transparent")

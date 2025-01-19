@@ -13,20 +13,22 @@ class ExpenseTracker(ctk.CTk):
 
         ctk.set_appearance_mode("dark-blue")
 
+        self.currency = "USD"
+
         self.dashboard_page()
 
     def clear_content_frame(self):
         for widget in self.content_frame.winfo_children():
-            widget.destroy()
+            widget.grid_forget()
 
     def dashboard_page(self):
         for widget in self.winfo_children():
             widget.grid_forget()
 
         self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=10)
+        self.grid_rowconfigure(1, weight=9)
         self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=10)
+        self.grid_columnconfigure(1, weight=9)
 
         # Header Frame
         self.header_frame = ctk.CTkFrame(self)

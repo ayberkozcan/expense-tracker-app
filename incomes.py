@@ -65,10 +65,10 @@ def incomes_page(self):
     footer_frame.grid_columnconfigure(0, weight=1)
     footer_frame.grid_columnconfigure(1, weight=1)
 
-    categories = ["All Categories", "Salary", "Freelance", "Investment", "Rental Income", "Gift"]
-    selected_category = ctk.StringVar(value=categories[0])
+    self.income_categories = ["All Categories", "Salary", "Freelance", "Investment", "Rental Income", "Gift"]
+    selected_category = ctk.StringVar(value=self.income_categories[0])
 
-    categories_selectBox = ctk.CTkOptionMenu(footer_frame, values=categories, variable=selected_category).grid(row=0, column=0, pady=5, sticky="w")
+    categories_selectBox = ctk.CTkOptionMenu(footer_frame, values=self.income_categories, variable=selected_category).grid(row=0, column=0, pady=5, sticky="w")
 
     # Left Footer Frame
     records_by_categories_frame = ctk.CTkScrollableFrame(footer_frame, fg_color="transparent")
@@ -86,5 +86,5 @@ def incomes_page(self):
     income_by_categories_frame = ctk.CTkScrollableFrame(footer_frame, fg_color="transparent")
     income_by_categories_frame.grid(row=1, column=1, sticky="nsew")
 
-    for i, category in enumerate(categories, start=1):
+    for i, category in enumerate(self.income_categories, start=1):
         label = ctk.CTkLabel(income_by_categories_frame, text="* "+category).grid(row=i, column=0, pady=5, sticky="w")

@@ -14,6 +14,8 @@ class ExpenseTracker(ctk.CTk):
         ctk.set_appearance_mode("dark-blue")
 
         self.currency = "USD"
+        self.income_categories = ["Other", "Salary", "Freelance", "Investment", "Rental Income", "Gift"]
+        self.expense_categories = ["Other", "Housing", "Food", "Transportation", "Healthcare", "Entertainment"]
 
         self.dashboard_page()
 
@@ -141,9 +143,11 @@ class ExpenseTracker(ctk.CTk):
 
         # Category field
         if operation == "income":
-            categories = ["Other", "Salary", "Freelance", "Investment", "Rental Income", "Gift"]
+            # categories = ["Other", "Salary", "Freelance", "Investment", "Rental Income", "Gift"]
+            categories = self.income_categories
         else:
-            categories = ["Other", "Housing", "Food", "Transportation", "Healthcare", "Entertainment"]
+            # categories = ["Other", "Housing", "Food", "Transportation", "Healthcare", "Entertainment"]
+            categories = self.expense_categories
         
         selected_category = ctk.StringVar(value=categories[0])
 

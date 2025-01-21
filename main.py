@@ -3,6 +3,7 @@ from incomes import incomes_page
 from expenses import expenses_page
 from reports import reports_page
 from settings import settings_page
+import sqlite3
 
 class ExpenseTracker(ctk.CTk):
     def __init__(self):
@@ -14,10 +15,36 @@ class ExpenseTracker(ctk.CTk):
         ctk.set_appearance_mode("dark-blue")
 
         self.currency = "USD"
-        self.income_categories = ["Other", "Salary", "Freelance", "Investment", "Rental Income", "Gift"]
-        self.expense_categories = ["Other", "Housing", "Food", "Transportation", "Healthcare", "Entertainment"]
+
+        self.connect_database()
+
+        self.get_categories()
+
+        # self.income_categories = ["Other", "Salary", "Freelance", "Investment", "Rental Income", "Gift"]
+        # self.expense_categories = ["Other", "Housing", "Food", "Transportation", "Healthcare", "Entertainment"]
 
         self.dashboard_page()
+
+    def connect_database(self):
+        self.conn = sqlite3.connect("data/database/categories.db")
+        self.cursor = self.conn.cursor()
+
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS categories (
+                category_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT,
+                type TEXT
+            )
+        """)
+
+        self.conn.commit()
+
+    def get_categories(self):
+        self.cursor.execute("SELECT name FROM categories WHERE TYPE = 'income'")
+        self.income_categories = self.cursor.fetchall()
+
+        self.cursor.execute("SELECT name FROM categories WHERE TYPE = 'expense'")
+        self.expense_categories = self.cursor.fetchall()
 
     def clear_content_frame(self):
         for widget in self.content_frame.winfo_children():

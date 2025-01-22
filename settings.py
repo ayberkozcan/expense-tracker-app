@@ -13,9 +13,8 @@ def settings_page(self):
     label = ctk.CTkLabel(currency_frame, text="Currency", font=("Helvetica", 20))
     label.grid(row=0, column=0, pady=10, sticky="w")
 
-    currencies = ["USD", "EUR", "JPY", "GBP", "AUD", "CAD", "CHF", "CNY", "SEK", "TRY"]
     selected_currency = ctk.StringVar(value=self.currency)
-    categories_selectBox = ctk.CTkOptionMenu(currency_frame, values=currencies, variable=selected_currency, font=("Helvetica", 14), height=40)
+    categories_selectBox = ctk.CTkOptionMenu(currency_frame, values=self.currencies, variable=selected_currency, font=("Helvetica", 14), height=40)
     categories_selectBox.grid(row=1, column=0, sticky="w")
 
     selectBox_submit_button = ctk.CTkButton(currency_frame, text="Submit", width=50, height=40, command=lambda: change_currency(self, selected_currency.get()))
@@ -149,10 +148,32 @@ def manage_categories_screen(self):
     button2 = ctk.CTkButton(self.content_frame, text="Add Category", height=40, corner_radius=5, fg_color="green", hover_color="darkgreen", command=lambda: add_category(self, "expense"))
     button2.grid(row=2, column=1)
 
-def edit_category(self, category_id):
-    edit_screen = ctk.CTkToplevel(self)
-    edit_screen.geometry("300x150")
-    edit_screen.title("Edit Category")
+def edit_category(self, old_name):
+    def limit_input(*args):
+        current_text = entry_var.get()
+        if len(current_text) > 20:
+            entry_var.set(current_text[:20])
+
+    self.edit_category_screen = ctk.CTkToplevel(self)
+    self.edit_category_screen.geometry("250x200")
+    self.edit_category_screen.title("Edit Category")
+
+    self.edit_category_screen.grid_rowconfigure(0, weight=1)
+    self.edit_category_screen.grid_rowconfigure(1, weight=1)
+    self.edit_category_screen.grid_rowconfigure(2, weight=1)
+    self.edit_category_screen.grid_columnconfigure(0, weight=1)
+
+    label = ctk.CTkLabel(self.edit_category_screen, text="Rename", font=("Helvetica", 15)).grid(row=0, column=0)
+
+    entry_var = ctk.StringVar()
+    entry_var.trace("w", limit_input)
+
+    entry = ctk.CTkEntry(self.edit_category_screen, textvariable=entry_var, placeholder_text="Category Name...", corner_radius=5)
+    entry.insert(0, old_name)
+    entry.grid(row=1, column=0, pady=(0, 20))
+
+    submit = ctk.CTkButton(self.edit_category_screen, text="Edit", fg_color="green", hover_color="darkgreen", command=lambda: edit_category_db(self, entry.get(), old_name))
+    submit.grid(row=2, column=0, pady=20)
 
 def delete_category(self, category_name):
     confirm = messagebox.askyesno(
@@ -184,16 +205,19 @@ def add_category(self, category_type):
 
     self.add_category_screen.grid_rowconfigure(0, weight=1)
     self.add_category_screen.grid_rowconfigure(1, weight=1)
+    self.add_category_screen.grid_rowconfigure(2, weight=1)
     self.add_category_screen.grid_columnconfigure(0, weight=1)
+
+    label = ctk.CTkLabel(self.add_category_screen, text="Category Name", font=("Helvetica", 15)).grid(row=0, column=0)
 
     entry_var = ctk.StringVar()
     entry_var.trace("w", limit_input)
 
     entry = ctk.CTkEntry(self.add_category_screen, textvariable=entry_var, placeholder_text="Category Name...", corner_radius=5)
-    entry.grid(row=0, column=0, pady=20)
+    entry.grid(row=1, column=0, pady=(0, 20))
 
     submit = ctk.CTkButton(self.add_category_screen, text="Add", fg_color="green", hover_color="darkgreen", command=lambda: add_category_to_db(self, entry.get(), category_type))
-    submit.grid(row=1, column=0, pady=20)
+    submit.grid(row=2, column=0, pady=20)
 
 def add_category_to_db(self, name, category_type):
     if len(name) == 0:
@@ -203,12 +227,20 @@ def add_category_to_db(self, name, category_type):
         if control:
             messagebox.showerror("Error", "This category already exists!")
         else:
-            self.cursor.execute("""INSERT INTO categories (name, type) VALUES(:name, :type)""", {"name": name, "type": category_type})
+            self.cursor.execute("INSERT INTO categories (name, type) VALUES(:name, :type)", {"name": name, "type": category_type})
             self.conn.commit()
             messagebox.showinfo("Success", "New category added successfully!")
             
             self.add_category_screen.destroy()
             manage_categories_screen(self)
             
+def edit_category_db(self, new_name, old_name):
+    if len(new_name) == 0:
+        messagebox.showerror("Error", "Category name must be longer!")
+    else:
+        self.cursor.execute("UPDATE categories SET name = ? WHERE name = ?", (new_name, old_name))
+        self.conn.commit()
+        messagebox.showinfo("Success", "Category name updated!")
 
-    
+        self.edit_category_screen.destroy()
+        manage_categories_screen(self)

@@ -14,14 +14,12 @@ class ExpenseTracker(ctk.CTk):
 
         ctk.set_appearance_mode("dark-blue")
 
+        self.currencies = ["USD", "EUR", "JPY", "GBP", "AUD", "CAD", "CHF", "CNY", "SEK", "TRY"]
         self.currency = "USD"
 
         self.connect_database()
 
         self.get_categories()
-
-        # self.income_categories = ["Other", "Salary", "Freelance", "Investment", "Rental Income", "Gift"]
-        # self.expense_categories = ["Other", "Housing", "Food", "Transportation", "Healthcare", "Entertainment"]
 
         self.dashboard_page()
 
@@ -146,6 +144,8 @@ class ExpenseTracker(ctk.CTk):
     
     def add_income_expense_screen(self, operation):
         self.clear_content_frame()
+
+        categories = []
         
         if operation == "income":
             text = "Add Income"
@@ -161,7 +161,7 @@ class ExpenseTracker(ctk.CTk):
         center_frame.grid_columnconfigure(1, weight=1)
 
         # Amount field
-        label = ctk.CTkLabel(center_frame, text="Amount", font=("Helvetica", 20)).grid(row=0, column=0, sticky="w")
+        label = ctk.CTkLabel(center_frame, text=f"Amount ({self.currency})", font=("Helvetica", 20)).grid(row=0, column=0, sticky="w")
         
         validate_command = (self.content_frame.register(self.validate_number), "%P")
 
@@ -170,11 +170,11 @@ class ExpenseTracker(ctk.CTk):
 
         # Category field
         if operation == "income":
-            # categories = ["Other", "Salary", "Freelance", "Investment", "Rental Income", "Gift"]
-            categories = self.income_categories
+            for i, category in enumerate(self.income_categories):
+                categories.append(category[0])
         else:
-            # categories = ["Other", "Housing", "Food", "Transportation", "Healthcare", "Entertainment"]
-            categories = self.expense_categories
+            for i, category in enumerate(self.expense_categories):
+                categories.append(category[0])
         
         selected_category = ctk.StringVar(value=categories[0])
 

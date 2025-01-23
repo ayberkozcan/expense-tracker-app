@@ -127,6 +127,8 @@ def create_category_frame(self, category_type, categories, row, column):
     for i, category in enumerate(categories):
         label = ctk.CTkLabel(category_frame, text=category, font=("Helvetica", 15))
         label.grid(row=i, column=0, pady=10, sticky="w")
+        if category[0] == "Other":
+            continue
         edit_button = ctk.CTkButton(category_frame, text="Edit", width=20, fg_color="green", hover_color="darkgreen", command=lambda category_name=category[0]: edit_category(self, category_name))
         edit_button.grid(row=i, column=1, sticky="e")
         delete_button = ctk.CTkButton(category_frame, text="Delete", width=20, fg_color="red", hover_color="darkred", command=lambda category_name=category[0]: delete_category(self, category_name))

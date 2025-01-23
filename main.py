@@ -4,6 +4,8 @@ from expenses import expenses_page
 from reports import reports_page
 from settings import settings_page
 import sqlite3
+from tkcalendar import Calendar
+from tkinter import messagebox
 
 class ExpenseTracker(ctk.CTk):
     def __init__(self):
@@ -21,6 +23,8 @@ class ExpenseTracker(ctk.CTk):
 
         self.get_categories()
 
+        self.balance = self.get_balance()
+
         self.dashboard_page()
 
     def connect_database(self):
@@ -35,7 +39,27 @@ class ExpenseTracker(ctk.CTk):
             )
         """)
 
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS transactions (
+                transaction_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                amount REAL,
+                date DATE,
+                category TEXT,
+                type TEXT,
+                note TEXT
+            )
+        """)
         self.conn.commit()
+    
+    def get_balance(self):
+        balance = self.cursor.execute("""
+            SELECT
+                (SELECT SUM (amount) FROM transactions WHERE type = 'income' ) - 
+                (SELECT SUM (amount) FROM transactions WHERE type = 'expense') AS balance;
+            """
+        ).fetchone()
+
+        return balance[0]
 
     def get_categories(self):
         self.cursor.execute("SELECT name FROM categories WHERE TYPE = 'income'")
@@ -51,6 +75,8 @@ class ExpenseTracker(ctk.CTk):
     def dashboard_page(self):
         for widget in self.winfo_children():
             widget.grid_forget()
+
+        self.balance = self.get_balance()
 
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=9)
@@ -118,7 +144,7 @@ class ExpenseTracker(ctk.CTk):
         expenses_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
         expenses_frame.grid(row=1, column=1)
 
-        balance_label = ctk.CTkLabel(self.content_frame, text="Balance\n\n"+"2000$", font=("Helvetica", 25)).grid(row=0, column=0, columnspan=2)
+        balance_label = ctk.CTkLabel(self.content_frame, text="Balance\n\n"+str(self.balance)+"$", font=("Helvetica", 25)).grid(row=0, column=0, columnspan=2)
 
         label = ctk.CTkLabel(incomes_frame, text="Latest Incomes\n", font=("Helvetica", 20)).grid(row=0, column=0)
         
@@ -139,10 +165,10 @@ class ExpenseTracker(ctk.CTk):
         favourite_income_label = ctk.CTkLabel(self.content_frame, text="Favourite Income Category").grid(row=2, column=0)
         favourite_expense_label = ctk.CTkLabel(self.content_frame, text="Favourite Expense Category").grid(row=2, column=1)
 
-        add_income_button = ctk.CTkButton(self.content_frame, text="Add Income", font=("Helvetica", 20), height=50, fg_color="#008f11", hover_color="#00690c", corner_radius=20, command=lambda: self.add_income_expense_screen("income")).grid(row=3, column=0)
-        add_expense_button = ctk.CTkButton(self.content_frame, text="Add Expense", font=("Helvetica", 20), height=50, fg_color="#a71e00", hover_color="#7d1600", corner_radius=20, command=lambda: self.add_income_expense_screen("expense")).grid(row=3, column=1)
+        add_income_button = ctk.CTkButton(self.content_frame, text="Add Income", font=("Helvetica", 20), height=50, fg_color="#008f11", hover_color="#00690c", corner_radius=20, command=lambda: self.add_transaction_screen("income")).grid(row=3, column=0)
+        add_expense_button = ctk.CTkButton(self.content_frame, text="Add Expense", font=("Helvetica", 20), height=50, fg_color="#a71e00", hover_color="#7d1600", corner_radius=20, command=lambda: self.add_transaction_screen("expense")).grid(row=3, column=1)
     
-    def add_income_expense_screen(self, operation):
+    def add_transaction_screen(self, operation):
         self.clear_content_frame()
 
         categories = []
@@ -183,17 +209,28 @@ class ExpenseTracker(ctk.CTk):
         category_selectBox.grid(row=3, column=0, columnspan=2, sticky="w", pady=5)
 
         # Note field
-        label = ctk.CTkLabel(center_frame, text="Note", font=("Helvetica", 20)).grid(row=4, column=0, sticky="w", padx=10, pady=(25, 0))
+        label = ctk.CTkLabel(center_frame, text="Note (Optional)", font=("Helvetica", 20)).grid(row=4, column=0, sticky="w", padx=10, pady=(25, 0))
         note_textBox = ctk.CTkTextbox(center_frame, corner_radius=5, height=50, width=250)
         note_textBox.grid(row=5, column=0, columnspan=2, sticky="w", pady=5)
 
+        # Date field
+        calendar = Calendar(center_frame, background="darkgreen", selectmode="day", date_pattern="yyyy-mm-dd")
+        calendar.grid(row=6, column=0, columnspan=2, sticky="w", pady=(25, 0))
+
         # Submit button
-        submit_button = ctk.CTkButton(center_frame, text="Submit", font=("Helvetica", 20), corner_radius=5, height=35, width=150, command=self.dashboard_page)
-        submit_button.grid(row=6, column=0, columnspan=2, sticky="w", pady=(25, 0))
+        submit_button = ctk.CTkButton(
+            center_frame, text="Submit", 
+            font=("Helvetica", 20), 
+            corner_radius=5, 
+            height=35, 
+            width=150, 
+            command=lambda: self.add_transaction_to_db(amount_entry.get(), category_selectBox.get(), note_textBox.get("1.0", "end-1c") if note_textBox.get("1.0", "end-1c") != "" else "", calendar.get_date(), operation)
+        )
+        submit_button.grid(row=7, column=0, columnspan=2, sticky="w", pady=(25, 0))
 
         # Go Back button
         button = ctk.CTkButton(center_frame, text="Go Back", font=("Helvetica", 20), corner_radius=5, height=35, width=150, command=self.dashboard_page)
-        button.grid(row=7, column=0, columnspan=2, sticky="w", pady=(5, 20))
+        button.grid(row=8, column=0, columnspan=2, sticky="w", pady=(5, 20))
 
         def focus_selectbox(event):
             category_selectBox.focus_set()
@@ -212,6 +249,22 @@ class ExpenseTracker(ctk.CTk):
         if input_value == "" or input_value.isdigit():
             return True
         return False
+
+    def add_transaction_to_db(self, amount, category, note, date, operation):
+        self.cursor.execute("""
+            INSERT INTO transactions (amount, date, category, type, note) 
+            VALUES (:amount, :date, :category, :type, :note)
+        """, {
+            "amount": amount,
+            "date": date,
+            "category": category,
+            "type": operation,
+            "note": note
+        })
+        self.conn.commit()
+
+        messagebox.showinfo("Success", "Transaction successful!")
+        self.dashboard_page()
 
     def exit(self):
         self.destroy()

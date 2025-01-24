@@ -54,12 +54,17 @@ class ExpenseTracker(ctk.CTk):
     def get_balance(self):
         balance = self.cursor.execute("""
             SELECT
-                (SELECT SUM (amount) FROM transactions WHERE type = 'income' ) - 
-                (SELECT SUM (amount) FROM transactions WHERE type = 'expense') AS balance;
+                (SELECT COALESCE(SUM (amount), 0) FROM transactions WHERE type = 'income' ) - 
+                (SELECT COALESCE(SUM (amount), 0) FROM transactions WHERE type = 'expense') AS balance;
             """
         ).fetchone()
 
         return balance[0]
+    
+    def get_latest_transactions(self, type):
+        transactions = self.cursor.execute("SELECT amount, category FROM transactions WHERE type = ? ORDER BY transaction_id DESC LIMIT 3", (type,)).fetchall()
+        
+        return transactions
 
     def get_categories(self):
         self.cursor.execute("SELECT name FROM categories WHERE TYPE = 'income'")
@@ -135,6 +140,8 @@ class ExpenseTracker(ctk.CTk):
         exit_button.grid(row=6, column=0, padx=0, pady=30)
         
         self.clear_content_frame()
+        
+        balance_label = ctk.CTkLabel(self.content_frame, text="Balance\n\n"+str(self.balance)+"$", font=("Helvetica", 25)).grid(row=0, column=0, columnspan=2)
 
         # Incomes Frame
         incomes_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
@@ -144,23 +151,37 @@ class ExpenseTracker(ctk.CTk):
         expenses_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
         expenses_frame.grid(row=1, column=1)
 
-        balance_label = ctk.CTkLabel(self.content_frame, text="Balance\n\n"+str(self.balance)+"$", font=("Helvetica", 25)).grid(row=0, column=0, columnspan=2)
-
         label = ctk.CTkLabel(incomes_frame, text="Latest Incomes\n", font=("Helvetica", 20)).grid(row=0, column=0)
         
+        incomes = self.get_latest_transactions("income")
         # Income Records
-        money = 0 # Delete later
-        for i in range(3):
-            money += 100
-            label = ctk.CTkLabel(incomes_frame, text="*"+str(money).join(" $")+" (Category)").grid(row=i+1, column=0, sticky="w")
+        if len(incomes) < 3:
+            for i in range(3):
+                if len(incomes) == 0 and i == 0:
+                    label = ctk.CTkLabel(incomes_frame, text="No data found!")
+                    label.grid(row=i+1, column=0, sticky="w")
+                else:
+                    text = ""
+                label = ctk.CTkLabel(incomes_frame, text="")
+                label.grid(row=i+1, column=0, sticky="w")
+        for i, amount in enumerate(incomes):
+            label = ctk.CTkLabel(incomes_frame, text=f"* {incomes[i][0]} $ ({incomes[i][1]})").grid(row=i+1, column=0, sticky="w")
 
         label = ctk.CTkLabel(expenses_frame, text="Latest Expenses\n", font=("Helvetica", 20)).grid(row=0, column=0)
 
+        expenses = self.get_latest_transactions("expense")
         # Expense Records
-        money = 0 # Delete later
-        for i in range(3):
-            money += 100
-            label = ctk.CTkLabel(expenses_frame, text="*"+str(money).join(" $")+" (Category)").grid(row=i+1, column=0, sticky="w")
+        if len(expenses) < 3:
+            for i in range(3):
+                if len(expenses) == 0 and i == 0:
+                    label = ctk.CTkLabel(expenses_frame, text="No data found!")
+                    label.grid(row=i+1, column=0, sticky="w")
+                else:
+                    text = ""
+                label = ctk.CTkLabel(expenses_frame, text="")
+                label.grid(row=i+1, column=0, sticky="w")
+        for i, amount in enumerate(expenses):
+            label = ctk.CTkLabel(expenses_frame, text=f"* {expenses[i][0]} $ ({expenses[i][1]})").grid(row=i+1, column=0, sticky="w")
 
         favourite_income_label = ctk.CTkLabel(self.content_frame, text="Favourite Income Category").grid(row=2, column=0)
         favourite_expense_label = ctk.CTkLabel(self.content_frame, text="Favourite Expense Category").grid(row=2, column=1)

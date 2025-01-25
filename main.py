@@ -73,6 +73,19 @@ class ExpenseTracker(ctk.CTk):
         self.cursor.execute("SELECT name FROM categories WHERE TYPE = 'expense'")
         self.expense_categories = self.cursor.fetchall()
 
+    def get_fav_category(self, type):
+        fav_category = self.cursor.execute("""
+            SELECT COUNT(*) AS total_transaction, category
+            FROM transactions 
+            WHERE type = ?
+            GROUP BY category
+            ORDER BY total_transaction DESC
+            LIMIT 1;
+            """, 
+        (type,)).fetchall()
+
+        return fav_category[0][1]
+
     def clear_content_frame(self):
         for widget in self.content_frame.winfo_children():
             widget.grid_forget()
@@ -145,13 +158,23 @@ class ExpenseTracker(ctk.CTk):
 
         # Incomes Frame
         incomes_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
-        incomes_frame.grid(row=1, column=0)
+        incomes_frame.grid(row=1, column=0, sticky="we")
+        incomes_frame.grid_rowconfigure(0, weight=1)
+        incomes_frame.grid_rowconfigure(1, weight=9)
+        incomes_frame.grid_columnconfigure(0, weight=1)
+        incomes_frame.grid_columnconfigure(1, weight=1)
 
         # Expenses Frame
         expenses_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
-        expenses_frame.grid(row=1, column=1)
+        expenses_frame.grid(row=1, column=1, sticky="we")
+        expenses_frame.grid_rowconfigure(0, weight=1)
+        expenses_frame.grid_rowconfigure(1, weight=9)
+        expenses_frame.grid_columnconfigure(0, weight=1)
+        expenses_frame.grid_columnconfigure(1, weight=1)
 
-        label = ctk.CTkLabel(incomes_frame, text="Latest Incomes\n", font=("Helvetica", 20)).grid(row=0, column=0)
+        label = ctk.CTkLabel(incomes_frame, text="Latest Incomes\n", font=("Helvetica", 20)).grid(row=0, column=0, columnspan=2)
+        amount_label = ctk.CTkLabel(incomes_frame, text="Amount", font=("Helvetica", 18)).grid(row=1, column=0)
+        category_label = ctk.CTkLabel(incomes_frame, text="Category", font=("Helvetica", 18)).grid(row=1, column=1)
         
         incomes = self.get_latest_transactions("income")
         # Income Records
@@ -159,15 +182,18 @@ class ExpenseTracker(ctk.CTk):
             for i in range(3):
                 if len(incomes) == 0 and i == 0:
                     label = ctk.CTkLabel(incomes_frame, text="No data found!")
-                    label.grid(row=i+1, column=0, sticky="w")
+                    label.grid(row=i+2, column=0, sticky="w")
                 else:
                     text = ""
                 label = ctk.CTkLabel(incomes_frame, text="")
-                label.grid(row=i+1, column=0, sticky="w")
+                label.grid(row=i+2, column=0, sticky="w")
         for i, amount in enumerate(incomes):
-            label = ctk.CTkLabel(incomes_frame, text=f"* {incomes[i][0]} $ ({incomes[i][1]})").grid(row=i+1, column=0, sticky="w")
+            label = ctk.CTkLabel(incomes_frame, text=f"{incomes[i][0]} $").grid(row=i+2, column=0)
+            category = ctk.CTkLabel(incomes_frame, text=incomes[i][1]).grid(row=i+2, column=1)
 
-        label = ctk.CTkLabel(expenses_frame, text="Latest Expenses\n", font=("Helvetica", 20)).grid(row=0, column=0)
+        label = ctk.CTkLabel(expenses_frame, text="Latest Expenses\n", font=("Helvetica", 20)).grid(row=0, column=0, columnspan=2)
+        amount_label = ctk.CTkLabel(expenses_frame, text="Amount", font=("Helvetica", 18)).grid(row=1, column=0)
+        category_label = ctk.CTkLabel(expenses_frame, text="Category", font=("Helvetica", 18)).grid(row=1, column=1)
 
         expenses = self.get_latest_transactions("expense")
         # Expense Records
@@ -175,20 +201,24 @@ class ExpenseTracker(ctk.CTk):
             for i in range(3):
                 if len(expenses) == 0 and i == 0:
                     label = ctk.CTkLabel(expenses_frame, text="No data found!")
-                    label.grid(row=i+1, column=0, sticky="w")
+                    label.grid(row=i+2, column=0, sticky="w")
                 else:
                     text = ""
                 label = ctk.CTkLabel(expenses_frame, text="")
-                label.grid(row=i+1, column=0, sticky="w")
+                label.grid(row=i+2, column=0, sticky="w")
         for i, amount in enumerate(expenses):
-            label = ctk.CTkLabel(expenses_frame, text=f"* {expenses[i][0]} $ ({expenses[i][1]})").grid(row=i+1, column=0, sticky="w")
+            label = ctk.CTkLabel(expenses_frame, text=f"{expenses[i][0]} $").grid(row=i+2, column=0)
+            category = ctk.CTkLabel(expenses_frame, text=expenses[i][1]).grid(row=i+2, column=1)
 
-        favourite_income_label = ctk.CTkLabel(self.content_frame, text="Favourite Income Category").grid(row=2, column=0)
-        favourite_expense_label = ctk.CTkLabel(self.content_frame, text="Favourite Expense Category").grid(row=2, column=1)
+        fav_income_category = self.get_fav_category("income")
+        fav_expense_category = self.get_fav_category("expense")
+
+        favourite_income_label = ctk.CTkLabel(self.content_frame, text=f"Favourite Income Category\n\n{fav_income_category}").grid(row=2, column=0)
+        favourite_expense_label = ctk.CTkLabel(self.content_frame, text=f"Favourite Expense Category\n\n{fav_expense_category}").grid(row=2, column=1)
 
         add_income_button = ctk.CTkButton(self.content_frame, text="Add Income", font=("Helvetica", 20), height=50, fg_color="#008f11", hover_color="#00690c", corner_radius=20, command=lambda: self.add_transaction_screen("income")).grid(row=3, column=0)
         add_expense_button = ctk.CTkButton(self.content_frame, text="Add Expense", font=("Helvetica", 20), height=50, fg_color="#a71e00", hover_color="#7d1600", corner_radius=20, command=lambda: self.add_transaction_screen("expense")).grid(row=3, column=1)
-    
+
     def add_transaction_screen(self, operation):
         self.clear_content_frame()
 
@@ -202,7 +232,7 @@ class ExpenseTracker(ctk.CTk):
 
         # Center frame
         center_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
-        center_frame.grid(row=0, column=1, sticky="nsew", padx=20, pady=100)
+        center_frame.grid(row=0, column=1, sticky="nsew", padx=20, pady=50)
 
         center_frame.grid_columnconfigure(0, weight=1)
         center_frame.grid_columnconfigure(1, weight=1)
@@ -272,6 +302,10 @@ class ExpenseTracker(ctk.CTk):
         return False
 
     def add_transaction_to_db(self, amount, category, note, date, operation):
+        if amount == 0 or not amount:
+            messagebox.showerror("Error", "Amount cannot be 0!")
+            return
+        
         self.cursor.execute("""
             INSERT INTO transactions (amount, date, category, type, note) 
             VALUES (:amount, :date, :category, :type, :note)

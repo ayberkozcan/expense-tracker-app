@@ -61,8 +61,8 @@ class ExpenseTracker(ctk.CTk):
 
         return balance[0]
     
-    def get_latest_transactions(self, type):
-        transactions = self.cursor.execute("SELECT amount, category FROM transactions WHERE type = ? ORDER BY transaction_id DESC LIMIT 3", (type,)).fetchall()
+    def get_latest_transactions(self, type, limit=3):
+        transactions = self.cursor.execute("SELECT amount, category FROM transactions WHERE type = ? ORDER BY transaction_id DESC LIMIT ?", (type, limit)).fetchall()
         
         return transactions
 
@@ -85,6 +85,11 @@ class ExpenseTracker(ctk.CTk):
         (type,)).fetchall()
 
         return fav_category[0][1]
+    
+    def get_latest_transactions_by_category(self, type, category, limit=3):
+        transactions = self.cursor.execute("SELECT amount, category FROM transactions WHERE type = ? AND category = ? ORDER BY transaction_id DESC LIMIT ?", (type, category, limit)).fetchall()
+        
+        return transactions
 
     def clear_content_frame(self):
         for widget in self.content_frame.winfo_children():

@@ -74,22 +74,38 @@ class ExpenseTracker(ctk.CTk):
         self.expense_categories = self.cursor.fetchall()
 
     def get_fav_category(self, type):
-        fav_category = self.cursor.execute("""
-            SELECT COUNT(*) AS total_transaction, category
-            FROM transactions 
-            WHERE type = ?
-            GROUP BY category
-            ORDER BY total_transaction DESC
-            LIMIT 1;
-            """, 
-        (type,)).fetchall()
+        try:
+            fav_category = self.cursor.execute("""
+                SELECT COUNT(*) AS total_transaction, category
+                FROM transactions 
+                WHERE type = ?
+                GROUP BY category
+                ORDER BY total_transaction DESC
+                LIMIT 1;
+                """, 
+            (type,)).fetchone()[1]
+            
+            return fav_category
+        except:
+            print("no data")
 
-        return fav_category[0][1]
-    
     def get_latest_transactions_by_category(self, type, category, limit=3):
-        transactions = self.cursor.execute("SELECT amount, category FROM transactions WHERE type = ? AND category = ? ORDER BY transaction_id DESC LIMIT ?", (type, category, limit)).fetchall()
-        
+        transactions = self.cursor.execute("SELECT transaction_id, amount, category FROM transactions WHERE type = ? AND category = ? ORDER BY transaction_id DESC LIMIT ?", (type, category, limit)).fetchall()
+
         return transactions
+
+    def get_total_amount_by_categories(self, type, category):
+        total_amount = self.cursor.execute("SELECT SUM(amount) FROM transactions WHERE type = ? AND category = ?", (type, category)).fetchone()[0]
+
+        return total_amount
+    
+    def delete_transaction(self, id):
+        control = messagebox.askyesno("Delete Transaction", "Are you sure you want to delete this transaction?")
+        if control:
+            self.cursor.execute("DELETE FROM transactions WHERE transaction_id = ?", (id,))
+        self.conn.commit()
+
+        incomes_page(self)
 
     def clear_content_frame(self):
         for widget in self.content_frame.winfo_children():
@@ -187,7 +203,7 @@ class ExpenseTracker(ctk.CTk):
             for i in range(3):
                 if len(incomes) == 0 and i == 0:
                     label = ctk.CTkLabel(incomes_frame, text="No data found!")
-                    label.grid(row=i+2, column=0, sticky="w")
+                    label.grid(row=i+2, column=0, sticky="")
                 else:
                     text = ""
                 label = ctk.CTkLabel(incomes_frame, text="")

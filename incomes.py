@@ -24,9 +24,17 @@ def incomes_page(self):
     chart_frame = ctk.CTkFrame(top_frame, fg_color="transparent")
     chart_frame.grid(row=0, column=0, sticky="w")
 
-    labels = ['Category 1', 'Category 2', 'Category 3', 'Category 4']
-    sizes = [25, 35, 20, 20]
+    labels = [label[0] for label in self.income_categories]
 
+    category_amounts = []
+    for category in self.income_categories:
+        category_amounts.append(self.get_total_amount_by_categories("income", category[0]))
+        
+    sizes = []
+    for i in range(len(category_amounts)):
+        percent = (category_amounts[i] * 100) / sum(category_amounts)
+        sizes.append(percent)
+        
     fig, ax = plt.subplots(figsize=(4, 3))
     ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
     ax.axis('equal')
@@ -67,13 +75,24 @@ def incomes_page(self):
     footer_frame.grid(row=2, column=0, columnspan=2, padx=20, pady=10, sticky="nsew")
     footer_frame.grid_columnconfigure((0, 1), weight=1)
     
-    categories = []
-    for i, category in enumerate(self.income_categories):
-        categories.append(category[0])
+    categories = [category[0] for category in self.income_categories]
     
     selected_category = ctk.StringVar(value=categories[0])
 
-    categories_selectBox = ctk.CTkOptionMenu(footer_frame, values=categories, variable=selected_category)
+    def update_records_by_category(selected):
+        for widget in records_by_categories_frame.winfo_children():
+            widget.destroy()
+
+        incomes = self.get_latest_transactions_by_category("income", selected, 10)
+        for i, amount in enumerate(incomes):
+            label = ctk.CTkLabel(records_by_categories_frame, text=f"{incomes[i][1]} $").grid(row=i+2, column=0, pady=5, sticky="w")
+            details = ctk.CTkButton(records_by_categories_frame, text="Details", width=20)
+            details.grid(row=i+2, column=1, sticky="")
+            id = incomes[i][0]
+            delete = ctk.CTkButton(records_by_categories_frame, text="Delete", width=20, fg_color="red", hover_color="darkred", command=lambda id=id: self.delete_transaction(id))
+            delete.grid(row=i+2, column=1, sticky="e")
+
+    categories_selectBox = ctk.CTkOptionMenu(footer_frame, values=categories, variable=selected_category, command=update_records_by_category)
     categories_selectBox.grid(row=0, column=0, pady=5, sticky="w")
 
     # Left Footer Frame
@@ -81,20 +100,20 @@ def incomes_page(self):
     records_by_categories_frame.grid(row=1, column=0, sticky="nsew")
     records_by_categories_frame.grid_columnconfigure((0, 1), weight=1)
 
-    incomes = self.get_latest_transactions_by_category("income", "Other", 10)
-
-    for i, amount in enumerate(incomes):
-        label = ctk.CTkLabel(records_by_categories_frame, text=f"{incomes[i][0]} $").grid(row=i+2, column=0, pady=5, sticky="w")
-        details = ctk.CTkButton(records_by_categories_frame, text="Details", width=20)
-        details.grid(row=i+2, column=1, sticky="")
-        delete = ctk.CTkButton(records_by_categories_frame, text="Delete", width=20, fg_color="red", hover_color="darkred")
-        delete.grid(row=i+2, column=1, sticky="e")
+    update_records_by_category(selected_category.get())
 
     label = ctk.CTkLabel(footer_frame, text="Total Income by Categories "+"This Week", font=("Helvetica", 15)).grid(row=0, column=1, sticky="w")
 
     # Right Footer Frame
     income_by_categories_frame = ctk.CTkScrollableFrame(footer_frame, fg_color="transparent")
     income_by_categories_frame.grid(row=1, column=1, sticky="nsew")
+    income_by_categories_frame.grid_columnconfigure((0, 1), weight=1)
 
-    for i, category in enumerate(categories, start=1):
-        label = ctk.CTkLabel(income_by_categories_frame, text="* "+category).grid(row=i, column=0, pady=5, sticky="w")
+    label = ctk.CTkLabel(income_by_categories_frame, text="Category").grid(row=0, column=0, pady=5, sticky="w")
+    label = ctk.CTkLabel(income_by_categories_frame, text="Total Amount").grid(row=0, column=1, pady=5, sticky="w")
+
+    for i, category in enumerate(categories, start=1):  
+        total_amount = self.get_total_amount_by_categories("income", category)
+        text = "No data..." if not total_amount else total_amount
+        label = ctk.CTkLabel(income_by_categories_frame, text=category).grid(row=i+1, column=0, pady=5, sticky="w")
+        label = ctk.CTkLabel(income_by_categories_frame, text=text).grid(row=i+1, column=1, pady=5, sticky="w")

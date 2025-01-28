@@ -13,7 +13,15 @@ def incomes_page(self):
     self.content_frame.grid_columnconfigure(0, weight=1)
     self.content_frame.grid_columnconfigure(1, weight=1)
 
-    net_income = ctk.CTkLabel(self.content_frame, text="2000$", text_color="darkgreen", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
+    net_income = 0
+    used_categories = []
+
+    used_categories = [income_category[0] for income_category in self.get_used_categories("income")]
+
+    for category in used_categories:  
+        total_amount = self.get_total_amount_by_categories("income", category)
+        net_income += total_amount
+    net_income_label = ctk.CTkLabel(self.content_frame, text=str(net_income)+"$", text_color="darkgreen", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
 
     # Top Frame
     top_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
@@ -25,11 +33,15 @@ def incomes_page(self):
     chart_frame.grid(row=0, column=0, sticky="w")
 
     labels = [label[0] for label in self.income_categories]
-
+    
     category_amounts = []
     for category in self.income_categories:
-        category_amounts.append(self.get_total_amount_by_categories("income", category[0]))
-        
+        amount = self.get_total_amount_by_categories("income", category[0])
+        if amount:
+            category_amounts.append(amount)
+        else:
+            category_amounts.append(0)
+
     sizes = []
     for i in range(len(category_amounts)):
         percent = (category_amounts[i] * 100) / sum(category_amounts)

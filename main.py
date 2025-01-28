@@ -103,9 +103,14 @@ class ExpenseTracker(ctk.CTk):
         control = messagebox.askyesno("Delete Transaction", "Are you sure you want to delete this transaction?")
         if control:
             self.cursor.execute("DELETE FROM transactions WHERE transaction_id = ?", (id,))
-        self.conn.commit()
+            self.conn.commit()
+            
+            incomes_page(self)
 
-        incomes_page(self)
+    def get_used_categories(self, type):
+        categories = self.cursor.execute("SELECT category FROM transactions WHERE type = ?", (type,)).fetchall()
+
+        return categories
 
     def clear_content_frame(self):
         for widget in self.content_frame.winfo_children():

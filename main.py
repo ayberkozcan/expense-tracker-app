@@ -6,6 +6,7 @@ from settings import settings_page
 import sqlite3
 from tkcalendar import Calendar
 from tkinter import messagebox
+from datetime import datetime, timedelta
 
 class ExpenseTracker(ctk.CTk):
     def __init__(self):
@@ -18,6 +19,7 @@ class ExpenseTracker(ctk.CTk):
 
         self.currencies = ["USD", "EUR", "JPY", "GBP", "AUD", "CAD", "CHF", "CNY", "SEK", "TRY"]
         self.currency = "USD"
+        self.period = "This Week"
 
         self.connect_database()
 
@@ -89,13 +91,15 @@ class ExpenseTracker(ctk.CTk):
         except:
             print("no data")
 
-    def get_latest_transactions_by_category(self, type, category, limit=3):
-        transactions = self.cursor.execute("SELECT transaction_id, amount, category FROM transactions WHERE type = ? AND category = ? ORDER BY transaction_id DESC LIMIT ?", (type, category, limit)).fetchall()
+    def get_latest_transactions_by_category(self, type, category, period, limit=3):
+        time = self.period_to_date(period)
+        transactions = self.cursor.execute("SELECT transaction_id, amount, category FROM transactions WHERE type = ? AND category = ? AND date >= ? ORDER BY transaction_id DESC LIMIT ?", (type, category, time, limit)).fetchall()
 
         return transactions
 
-    def get_total_amount_by_categories(self, type, category):
-        total_amount = self.cursor.execute("SELECT SUM(amount) FROM transactions WHERE type = ? AND category = ?", (type, category)).fetchone()[0]
+    def get_total_amount_by_categories(self, type, category, period):
+        time = self.period_to_date(period)
+        total_amount = self.cursor.execute("SELECT SUM(amount) FROM transactions WHERE type = ? AND category = ? AND date >= ?", (type, category, time)).fetchone()[0]
 
         return total_amount
     
@@ -111,6 +115,27 @@ class ExpenseTracker(ctk.CTk):
         categories = self.cursor.execute("SELECT category FROM transactions WHERE type = ?", (type,)).fetchall()
 
         return categories
+    
+    def period_to_date(self, period):
+        today = datetime.today()
+
+        if period == "This Week":
+            start_of_week = today - timedelta(days=today.weekday())
+            return start_of_week.date().strftime("%Y-%m-%d")
+
+        if period == "This Month":
+            start_of_month = today.replace(day=1)
+            return start_of_month.date().strftime("%Y-%m-%d")
+
+        if period == "This Year":
+            start_of_year = today.replace(month=1, day=1)
+            return start_of_year.date().strftime("%Y-%m-%d")
+
+        if period == "All Time":
+            start_of_time = datetime(2000, 1, 1)
+            return start_of_time.date().strftime("%Y-%m-%d")
+        
+        return today.date().strftime("%Y-%m-%d")
 
     def clear_content_frame(self):
         for widget in self.content_frame.winfo_children():

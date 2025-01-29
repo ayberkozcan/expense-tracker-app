@@ -19,7 +19,7 @@ def incomes_page(self):
     used_categories = [income_category[0] for income_category in self.get_used_categories("income")]
 
     for category in used_categories:  
-        total_amount = self.get_total_amount_by_categories("income", category)
+        total_amount = self.get_total_amount_by_categories("income", category, "All Time")
         net_income += total_amount
     net_income_label = ctk.CTkLabel(self.content_frame, text=str(net_income)+"$", text_color="darkgreen", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
 
@@ -31,12 +31,25 @@ def incomes_page(self):
     # Chart Frame
     chart_frame = ctk.CTkFrame(top_frame, fg_color="transparent")
     chart_frame.grid(row=0, column=0, sticky="w")
+    
+    # Period Buttons
+    this_week_button = ctk.CTkButton(chart_frame, text="This Week", width=40, command=lambda: update_period(self, "This Week"))
+    this_week_button.grid(row=0, column=0, sticky="w")
+
+    this_month_button = ctk.CTkButton(chart_frame, text="This Month", width=40, command=lambda: update_period(self, "This Month"))
+    this_month_button.grid(row=0, column=1, sticky="")
+
+    this_year_button = ctk.CTkButton(chart_frame, text="This Year", width=40, command=lambda: update_period(self, "This Year"))
+    this_year_button.grid(row=0, column=2, sticky="")
+
+    all_time_button = ctk.CTkButton(chart_frame, text="All Time", width=40, command=lambda: update_period(self, "All Time"))
+    all_time_button.grid(row=0, column=3, sticky="e")
 
     labels = [label[0] for label in self.income_categories]
     
     category_amounts = []
     for category in self.income_categories:
-        amount = self.get_total_amount_by_categories("income", category[0])
+        amount = self.get_total_amount_by_categories("income", category[0], "All Time")
         if amount:
             category_amounts.append(amount)
         else:
@@ -76,12 +89,6 @@ def incomes_page(self):
         details = ctk.CTkButton(summary_frame, text="Details", width=20)
         details.grid(row=i+2, column=2, sticky="")
 
-    # Period Buttons
-    this_week_button = ctk.CTkButton(chart_frame, text="This Week", width=40).grid(row=0, column=0, sticky="w")
-    this_month_button = ctk.CTkButton(chart_frame, text="This Month", width=40).grid(row=0, column=1, sticky="")
-    this_year_button = ctk.CTkButton(chart_frame, text="This Year", width=40).grid(row=0, column=2, sticky="")
-    all_time_button = ctk.CTkButton(chart_frame, text="All Time", width=40).grid(row=0, column=3, sticky="e")
-
     # Footer Frame
     footer_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
     footer_frame.grid(row=2, column=0, columnspan=2, padx=20, pady=10, sticky="nsew")
@@ -95,7 +102,7 @@ def incomes_page(self):
         for widget in records_by_categories_frame.winfo_children():
             widget.destroy()
 
-        incomes = self.get_latest_transactions_by_category("income", selected, 10)
+        incomes = self.get_latest_transactions_by_category("income", selected, self.period, 10)
         for i, amount in enumerate(incomes):
             label = ctk.CTkLabel(records_by_categories_frame, text=f"{incomes[i][1]} $").grid(row=i+2, column=0, pady=5, sticky="w")
             details = ctk.CTkButton(records_by_categories_frame, text="Details", width=20)
@@ -114,7 +121,7 @@ def incomes_page(self):
 
     update_records_by_category(selected_category.get())
 
-    label = ctk.CTkLabel(footer_frame, text="Total Income by Categories "+"This Week", font=("Helvetica", 15)).grid(row=0, column=1, sticky="w")
+    label = ctk.CTkLabel(footer_frame, text="Total Income by Categories "+self.period, font=("Helvetica", 15)).grid(row=0, column=1, sticky="w")
 
     # Right Footer Frame
     income_by_categories_frame = ctk.CTkScrollableFrame(footer_frame, fg_color="transparent")
@@ -125,7 +132,12 @@ def incomes_page(self):
     label = ctk.CTkLabel(income_by_categories_frame, text="Total Amount").grid(row=0, column=1, pady=5, sticky="w")
 
     for i, category in enumerate(categories, start=1):  
-        total_amount = self.get_total_amount_by_categories("income", category)
+        total_amount = self.get_total_amount_by_categories("income", category, self.period)
         text = "No data..." if not total_amount else total_amount
         label = ctk.CTkLabel(income_by_categories_frame, text=category).grid(row=i+1, column=0, pady=5, sticky="w")
         label = ctk.CTkLabel(income_by_categories_frame, text=text).grid(row=i+1, column=1, pady=5, sticky="w")
+
+def update_period(self, period):
+    self.period = period
+
+    incomes_page(self)

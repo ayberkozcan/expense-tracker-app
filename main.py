@@ -89,7 +89,7 @@ class ExpenseTracker(ctk.CTk):
             
             return fav_category
         except:
-            print("no data")
+            print("no fav cateory data")
 
     def get_latest_transactions_by_category(self, type, category, period, limit=3):
         time = self.period_to_date(period)
@@ -220,8 +220,7 @@ class ExpenseTracker(ctk.CTk):
         expenses_frame.grid(row=1, column=1, sticky="we")
         expenses_frame.grid_rowconfigure(0, weight=1)
         expenses_frame.grid_rowconfigure(1, weight=9)
-        expenses_frame.grid_columnconfigure(0, weight=1)
-        expenses_frame.grid_columnconfigure(1, weight=1)
+        expenses_frame.grid_columnconfigure((0, 1), weight=1)
 
         label = ctk.CTkLabel(incomes_frame, text="Latest Incomes\n", font=("Helvetica", 20)).grid(row=0, column=0, columnspan=2)
         amount_label = ctk.CTkLabel(incomes_frame, text="Amount", font=("Helvetica", 18)).grid(row=1, column=0)
@@ -285,8 +284,7 @@ class ExpenseTracker(ctk.CTk):
         center_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
         center_frame.grid(row=0, column=1, sticky="nsew", padx=20, pady=50)
 
-        center_frame.grid_columnconfigure(0, weight=1)
-        center_frame.grid_columnconfigure(1, weight=1)
+        center_frame.grid_columnconfigure((0, 1), weight=1)
 
         # Amount field
         label = ctk.CTkLabel(center_frame, text=f"Amount ({self.currency})", font=("Helvetica", 20)).grid(row=0, column=0, sticky="w")

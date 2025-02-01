@@ -14,13 +14,17 @@ def incomes_page(self):
     self.content_frame.grid_columnconfigure(1, weight=1)
 
     net_income = 0
-    used_categories = []
+    # used_categories = []
 
-    used_categories = [income_category[0] for income_category in self.get_used_categories("income")]
+    # used_categories = [income_category[0] for income_category in self.get_used_categories("income")]
 
-    for category in used_categories:  
-        total_amount = self.get_total_amount_by_categories("income", category, "All Time")
-        net_income += total_amount
+    # for category in used_categories:  
+    #     total_amount = self.get_total_amount_by_categories("income", category, self.period)
+    #     try:
+    #         net_income += total_amount
+    #     except:
+    #         print(total_amount)
+    net_income = self.get_total_amount_by_type("income", self.period)
     net_income_label = ctk.CTkLabel(self.content_frame, text=str(net_income)+"$", text_color="darkgreen", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
 
     # Top Frame
@@ -49,7 +53,7 @@ def incomes_page(self):
     
     category_amounts = []
     for category in self.income_categories:
-        amount = self.get_total_amount_by_categories("income", category[0], "All Time")
+        amount = self.get_total_amount_by_categories("income", category[0], self.period)
         if amount:
             category_amounts.append(amount)
         else:

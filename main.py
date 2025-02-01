@@ -91,6 +91,15 @@ class ExpenseTracker(ctk.CTk):
         except:
             print("no fav cateory data")
 
+    def get_total_amount_by_type(self, type, period):
+        time = self.period_to_date(period)
+        total_amount = self.cursor.execute("SELECT SUM(amount) FROM transactions WHERE type = ? AND date >= ?", (type, time)).fetchone()[0]
+
+        if not total_amount:
+            total_amount = 0
+
+        return total_amount
+
     def get_latest_transactions_by_category(self, type, category, period, limit=3):
         time = self.period_to_date(period)
         transactions = self.cursor.execute("SELECT transaction_id, amount, category FROM transactions WHERE type = ? AND category = ? AND date >= ? ORDER BY transaction_id DESC LIMIT ?", (type, category, time, limit)).fetchall()
@@ -124,11 +133,13 @@ class ExpenseTracker(ctk.CTk):
             return start_of_week.date().strftime("%Y-%m-%d")
 
         if period == "This Month":
-            start_of_month = today.replace(day=1)
+            # start_of_month = today.replace(day=1)
+            start_of_month = today - timedelta(days=30)
             return start_of_month.date().strftime("%Y-%m-%d")
 
         if period == "This Year":
-            start_of_year = today.replace(month=1, day=1)
+            # start_of_year = today.replace(month=1, day=1)
+            start_of_year = today - timedelta(days=365)
             return start_of_year.date().strftime("%Y-%m-%d")
 
         if period == "All Time":

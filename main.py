@@ -129,7 +129,8 @@ class ExpenseTracker(ctk.CTk):
         today = datetime.today()
 
         if period == "This Week":
-            start_of_week = today - timedelta(days=today.weekday())
+            # start_of_week = today - timedelta(days=today.weekday())
+            start_of_week = today - timedelta(days=7)
             return start_of_week.date().strftime("%Y-%m-%d")
 
         if period == "This Month":

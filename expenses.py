@@ -52,7 +52,10 @@ def expenses_page(self):
 
     sizes = []
     for i in range(len(category_amounts)):
-        percent = (category_amounts[i] * 100) / sum(category_amounts)
+        if sum(category_amounts) == 0:
+            percent = 100 / len(self.income_categories)
+        else:
+            percent = (category_amounts[i] * 100) / sum(category_amounts)
         sizes.append(percent)
         
     fig, ax = plt.subplots(figsize=(4, 3))

@@ -16,7 +16,7 @@ def reports_page(self):
     self.content_frame.grid_columnconfigure(0, weight=1)
     self.content_frame.grid_columnconfigure(1, weight=1)
 
-    net_balance = ctk.CTkLabel(self.content_frame, text="500$", text_color="yellow", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
+    net_balance = ctk.CTkLabel(self.content_frame, text=str(self.balance)+"$", text_color="yellow", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
 
     # Top Frame
     top_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
@@ -52,25 +52,31 @@ def reports_page(self):
     all_time_button = ctk.CTkButton(chart_frame, text="All Time", width=40).grid(row=0, column=3, sticky="e")
 
     # Summary Frame
-    summary_frame = ctk.CTkScrollableFrame(top_frame, fg_color="transparent")
+    summary_frame = ctk.CTkFrame(top_frame, fg_color="transparent")
     summary_frame.grid(row=0, column=1, sticky="nsew")
+    summary_frame.grid_columnconfigure((0, 1, 2, 3), weight=1)
 
-    summary_header = ctk.CTkLabel(summary_frame, text="Summary (Last 10)", font=("Helvetica", 20)).grid(row=0, column=0, pady=(5, 20), sticky="w")
+    summary_header = ctk.CTkLabel(summary_frame, text="Summary", font=("Helvetica", 20)).grid(row=0, column=0, pady=(5, 20), sticky="w")
     
-    # Last 10 Records in Summary Frame
-    money = 0 # Delete later
-    for i in range(10):
-        money += 100
-        label = ctk.CTkLabel(summary_frame, text="*"+str(money).join(" $")+" (Income / Expense)").grid(row=i+1, column=0, pady=5, sticky="w")
-        details = ctk.CTkButton(summary_frame, text="Details", width=20).grid(row=i+1, column=1)
-
+    # Last Records in Summary Frame
+    label = ctk.CTkLabel(summary_frame, text="Amount").grid(row=1, column=0, pady=5, sticky="w")
+    label = ctk.CTkLabel(summary_frame, text="Category").grid(row=1, column=1, pady=5, sticky="w")
+    label = ctk.CTkLabel(summary_frame, text="Type").grid(row=1, column=2, pady=5, sticky="w")
+    transactions = self.get_all_latest_transactions(6)
+    for i, amount in enumerate(transactions):
+        label = ctk.CTkLabel(summary_frame, text=f"{transactions[i][0]} $").grid(row=i+2, column=0, pady=5, sticky="w")
+        category = ctk.CTkLabel(summary_frame, text=transactions[i][1]).grid(row=i+2, column=1, sticky="w")
+        type = ctk.CTkLabel(summary_frame, text=transactions[i][2]).grid(row=i+2, column=2, sticky="w")
+        details = ctk.CTkButton(summary_frame, text="Details", width=20)
+        details.grid(row=i+2, column=3, sticky="")
+    
     # Footer Frame
     footer_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
     footer_frame.grid(row=3, column=0, columnspan=2, padx=20, pady=10, sticky="nsew")
     footer_frame.grid_columnconfigure(0, weight=1)
     footer_frame.grid_columnconfigure(1, weight=1)
 
-    label = ctk.CTkLabel(footer_frame, text="Total Expense "+"This Week", font=("Helvetica", 15)).grid(row=0, column=0, sticky="w")
+    label = ctk.CTkLabel(footer_frame, text="Max Expense "+"This Week", font=("Helvetica", 15)).grid(row=0, column=0, sticky="w")
 
     label = ctk.CTkLabel(footer_frame, text="Max Income & Expense by Categories "+"This Week", font=("Helvetica", 15)).grid(row=0, column=1, sticky="w")
 
@@ -79,22 +85,25 @@ def reports_page(self):
 
     categories_selectBox = ctk.CTkOptionMenu(footer_frame, values=categories, variable=selected_category).grid(row=1, column=1, pady=15, sticky="w")
 
+    max_income = self.get_max_by_date(self.period, "income")
+    max_expense = self.get_max_by_date(self.period, "expense")
+
     # Left Footer Frame
     records_by_categories_frame = ctk.CTkFrame(footer_frame, fg_color="transparent")
     records_by_categories_frame.grid(row=2, column=0, sticky="nsew")
 
-    max_income_label = ctk.CTkLabel(records_by_categories_frame, text="Max Income: "+str(money)+"$")
+    max_income_label = ctk.CTkLabel(records_by_categories_frame, text="Max Income: "+str(max_income)+"$")
     max_income_label.grid(row=0, column=0, sticky="w")
 
-    max_expense_label = ctk.CTkLabel(records_by_categories_frame, text="Max Expense: "+str(money)+"$")
+    max_expense_label = ctk.CTkLabel(records_by_categories_frame, text="Max Expense: "+str(max_expense)+"$")
     max_expense_label.grid(row=1, column=0, sticky="w")
 
     # Right Footer Frame
     expense_by_categories_frame = ctk.CTkFrame(footer_frame, fg_color="transparent")
     expense_by_categories_frame.grid(row=2, column=1, sticky="nsew")
 
-    max_income_label = ctk.CTkLabel(expense_by_categories_frame, text="Max Income: "+str(money)+"$")
+    max_income_label = ctk.CTkLabel(expense_by_categories_frame, text="Max Income: "+"$")
     max_income_label.grid(row=0, column=0, sticky="w")
 
-    max_expense_label = ctk.CTkLabel(expense_by_categories_frame, text="Max Expense: "+str(money)+"$")
+    max_expense_label = ctk.CTkLabel(expense_by_categories_frame, text="Max Expense: "+"$")
     max_expense_label.grid(row=1, column=0, sticky="w")

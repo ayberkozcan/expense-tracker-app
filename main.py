@@ -67,6 +67,11 @@ class ExpenseTracker(ctk.CTk):
         transactions = self.cursor.execute("SELECT amount, category FROM transactions WHERE type = ? ORDER BY transaction_id DESC LIMIT ?", (type, limit)).fetchall()
         
         return transactions
+    
+    def get_all_latest_transactions(self, limit=3):
+        transactions = self.cursor.execute("SELECT amount, category, type FROM transactions ORDER BY date DESC LIMIT ?", (str(limit))).fetchall()
+
+        return transactions
 
     def get_categories(self):
         self.cursor.execute("SELECT name FROM categories WHERE TYPE = 'income'")
@@ -124,6 +129,14 @@ class ExpenseTracker(ctk.CTk):
         categories = self.cursor.execute("SELECT category FROM transactions WHERE type = ?", (type,)).fetchall()
 
         return categories
+    
+    def get_max_by_date(self, period, type):
+        time = self.period_to_date(period)
+        max_amount = self.cursor.execute("SELECT MAX(amount) FROM transactions WHERE type = ? AND date >= ?", (type, time)).fetchone()[0]
+        
+        max_amount = 0 if not max_amount else max_amount
+
+        return max_amount 
     
     def period_to_date(self, period):
         today = datetime.today()

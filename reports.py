@@ -46,10 +46,17 @@ def reports_page(self):
     canvas.get_tk_widget().grid(row=1, column=0, pady=(10, 5), columnspan=4, sticky="nsew")
 
     # Period Buttons
-    this_week_button = ctk.CTkButton(chart_frame, text="This Week", width=40).grid(row=0, column=0, sticky="w")
-    this_month_button = ctk.CTkButton(chart_frame, text="This Month", width=40).grid(row=0, column=1, sticky="")
-    this_year_button = ctk.CTkButton(chart_frame, text="This Year", width=40).grid(row=0, column=2, sticky="")
-    all_time_button = ctk.CTkButton(chart_frame, text="All Time", width=40).grid(row=0, column=3, sticky="e")
+    this_week_button = ctk.CTkButton(chart_frame, text="This Week", width=40, command=lambda: update_period(self, "This Week"))
+    this_week_button.grid(row=0, column=0, sticky="w")
+
+    this_month_button = ctk.CTkButton(chart_frame, text="This Month", width=40, command=lambda: update_period(self, "This Month"))
+    this_month_button.grid(row=0, column=1, sticky="")
+
+    this_year_button = ctk.CTkButton(chart_frame, text="This Year", width=40, command=lambda: update_period(self, "This Year"))
+    this_year_button.grid(row=0, column=2, sticky="")
+
+    all_time_button = ctk.CTkButton(chart_frame, text="All Time", width=40, command=lambda: update_period(self, "All Time"))
+    all_time_button.grid(row=0, column=3, sticky="e")
 
     # Summary Frame
     summary_frame = ctk.CTkFrame(top_frame, fg_color="transparent")
@@ -76,9 +83,9 @@ def reports_page(self):
     footer_frame.grid_columnconfigure(0, weight=1)
     footer_frame.grid_columnconfigure(1, weight=1)
 
-    label = ctk.CTkLabel(footer_frame, text="Max Expense "+"This Week", font=("Helvetica", 15)).grid(row=0, column=0, sticky="w")
+    label = ctk.CTkLabel(footer_frame, text="Max Expense "+self.period, font=("Helvetica", 15)).grid(row=0, column=0, sticky="w")
 
-    label = ctk.CTkLabel(footer_frame, text="Max Income & Expense by Categories "+"This Week", font=("Helvetica", 15)).grid(row=0, column=1, sticky="w")
+    label = ctk.CTkLabel(footer_frame, text="Max Income & Expense by Categories "+self.period, font=("Helvetica", 15)).grid(row=0, column=1, sticky="w")
 
     categories = ["All Categories", "Housing", "Food", "Transportation", "Healthcare", "Entertainment"]
     selected_category = ctk.StringVar(value=categories[0])
@@ -107,3 +114,8 @@ def reports_page(self):
 
     max_expense_label = ctk.CTkLabel(expense_by_categories_frame, text="Max Expense: "+"$")
     max_expense_label.grid(row=1, column=0, sticky="w")
+
+def update_period(self, period):
+    self.period = period
+
+    reports_page(self)

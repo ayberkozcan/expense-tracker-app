@@ -63,6 +63,29 @@ class ExpenseTracker(ctk.CTk):
 
         return balance[0]
     
+    def get_balance_by_date(self, period):
+        time = self.period_to_date(period)
+
+        balance = self.cursor.execute("""
+            SELECT 
+                date, 
+                COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) -
+                COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) AS balance
+            FROM transactions
+            WHERE date >= ?
+            GROUP BY date
+            ORDER BY date;
+            """
+        , (time,)).fetchall()
+
+        dates = [datetime.strptime(data[0], '%Y-%m-%d').day for data in balance]
+        
+
+        balances = [data[1] for data in balance]
+        print(dates)
+        
+        return dates, balances
+    
     def get_latest_transactions(self, type, limit=3):
         transactions = self.cursor.execute("SELECT amount, category FROM transactions WHERE type = ? ORDER BY transaction_id DESC LIMIT ?", (type, limit)).fetchall()
         

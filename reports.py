@@ -27,7 +27,10 @@ def reports_page(self):
     chart_frame.grid(row=0, column=0, sticky="w")
 
     net_balance = ctk.CTkLabel(self.content_frame, text=str(self.balance)+"$", text_color="yellow", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
-    dates, balances = self.get_balance_by_date(self.period)
+    if self.period != "This Month":
+        dates, balances = self.get_balance_by_date(self.period)
+    else:
+        dates, balances = self.get_balance_by_month(self.period)
 
     x = dates
     y = balances
@@ -38,6 +41,11 @@ def reports_page(self):
     ax.set_ylabel("Dollars")
     ax.grid(True)
 
+    if self.period == "This Month":
+        ax.set_title(f"Balance for {self.current_year}-{str(self.current_month).zfill(2)}", fontsize=10, fontweight="bold")
+    else:
+        ax.set_title(f"Balance", fontsize=10, fontweight="bold")
+
     fig.patch.set_alpha(0)
     ax.set_facecolor((0, 0, 0, 0))
 
@@ -45,6 +53,12 @@ def reports_page(self):
     canvas.draw()
     
     canvas.get_tk_widget().grid(row=1, column=0, pady=(10, 5), columnspan=4, sticky="nsew")
+
+    if self.period == "This Month":
+        left_arrow = ctk.CTkButton(chart_frame, text="<-", width=40, command=lambda: update_month(self, "back"))
+        left_arrow.grid(row=2, column=3, sticky="w")
+        right_arrow = ctk.CTkButton(chart_frame, text="->", width=40, command=lambda: update_month(self, "forward"))
+        right_arrow.grid(row=2, column=3, sticky="e")
 
     # Period Buttons
     this_week_button = ctk.CTkButton(chart_frame, text="This Week", width=40, command=lambda: update_period(self, "This Week"))
@@ -56,7 +70,7 @@ def reports_page(self):
     this_year_button = ctk.CTkButton(chart_frame, text="This Year", width=40, command=lambda: update_period(self, "This Year"))
     this_year_button.grid(row=0, column=2, sticky="")
 
-    all_time_button = ctk.CTkButton(chart_frame, text="All Time", width=40, command=lambda: update_period(self, "All Time"))
+    all_time_button = ctk.CTkButton(chart_frame, text="All Time", width=40)
     all_time_button.grid(row=0, column=3, sticky="e")
 
     # Summary Frame
@@ -65,7 +79,7 @@ def reports_page(self):
     summary_frame.grid_columnconfigure((0, 1, 2, 3), weight=1)
 
     summary_header = ctk.CTkLabel(summary_frame, text="Summary", font=("Helvetica", 20)).grid(row=0, column=0, pady=(5, 20), sticky="w")
-    
+
     # Last Records in Summary Frame
     label = ctk.CTkLabel(summary_frame, text="Amount").grid(row=1, column=0, pady=5, sticky="w")
     label = ctk.CTkLabel(summary_frame, text="Category").grid(row=1, column=1, pady=5, sticky="w")
@@ -77,7 +91,7 @@ def reports_page(self):
         type = ctk.CTkLabel(summary_frame, text=transactions[i][2]).grid(row=i+2, column=2, sticky="w")
         details = ctk.CTkButton(summary_frame, text="Details", width=20)
         details.grid(row=i+2, column=3, sticky="")
-    
+
     # Footer Frame
     footer_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
     footer_frame.grid(row=3, column=1, padx=20, pady=10, sticky="nsew")
@@ -121,5 +135,23 @@ def reports_page(self):
 
 def update_period(self, period):
     self.period = period
+
+    reports_page(self)
+
+def update_month(self, operation):
+    if operation == "back":
+        if self.current_month == 1:
+            self.current_month = 12
+            self.current_year -= 1
+        else:
+            self.current_month -= 1
+    else:
+        if self.current_month == 12:
+            self.current_month = 1
+            self.current_year += 1
+        else:
+            self.current_month += 1
+
+    self.formatted_date = f"{self.current_year}-{str(self.current_month).zfill(2)}-{str(self.current_day).zfill(2)}"
 
     reports_page(self)

@@ -180,7 +180,7 @@ def edit_category(self, old_name):
 def delete_category(self, category_name):
     confirm = messagebox.askyesno(
         "Delete Category",
-        "Are you sure you want to delete?"
+        "Are you sure you want to delete?\n\nDon't forget to delete transactions in category you want to delete!"
     )
     if confirm:
         self.cursor.execute("DELETE FROM categories WHERE name = ?", (category_name,))

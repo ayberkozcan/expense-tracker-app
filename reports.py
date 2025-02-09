@@ -35,16 +35,16 @@ def reports_page(self):
     x = dates
     y = balances
 
-    fig, ax = plt.subplots(figsize=(4, 3))
+    fig, ax = plt.subplots(figsize=(5, 4))
     ax.plot(x, y, marker='o', linestyle='-', color='g')
     ax.set_xlabel("Days")
     ax.set_ylabel("Dollars")
     ax.grid(True)
 
     if self.period == "This Month":
-        ax.set_title(f"Balance for {self.current_year}-{str(self.current_month).zfill(2)}", fontsize=10, fontweight="bold")
+        ax.set_title(f"Balance for {self.current_year}-{str(self.current_month).zfill(2)}", fontsize=11, fontweight="bold")
     else:
-        ax.set_title(f"Balance", fontsize=10, fontweight="bold")
+        ax.set_title(f"Balance", fontsize=11, fontweight="bold")
 
     fig.patch.set_alpha(0)
     ax.set_facecolor((0, 0, 0, 0))
@@ -61,7 +61,7 @@ def reports_page(self):
         right_arrow.grid(row=2, column=3, sticky="e")
 
     # Period Buttons
-    this_week_button = ctk.CTkButton(chart_frame, text="This Week", width=40, command=lambda: update_period(self, "This Week"))
+    this_week_button = ctk.CTkButton(chart_frame, text="This Week", width=40)
     this_week_button.grid(row=0, column=0, sticky="w")
 
     this_month_button = ctk.CTkButton(chart_frame, text="This Month", width=40, command=lambda: update_period(self, "This Month"))
@@ -84,7 +84,7 @@ def reports_page(self):
     label = ctk.CTkLabel(summary_frame, text="Amount").grid(row=1, column=0, pady=5, sticky="w")
     label = ctk.CTkLabel(summary_frame, text="Category").grid(row=1, column=1, pady=5, sticky="w")
     label = ctk.CTkLabel(summary_frame, text="Type").grid(row=1, column=2, pady=5, sticky="w")
-    transactions = self.get_all_latest_transactions(6)
+    transactions = self.get_all_latest_transactions(9)
     for i, amount in enumerate(transactions):
         label = ctk.CTkLabel(summary_frame, text=f"{transactions[i][0]} $").grid(row=i+2, column=0, pady=5, sticky="w")
         category = ctk.CTkLabel(summary_frame, text=transactions[i][1]).grid(row=i+2, column=1, sticky="w")
@@ -94,7 +94,7 @@ def reports_page(self):
 
     # Footer Frame
     footer_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
-    footer_frame.grid(row=3, column=1, padx=20, pady=10, sticky="nsew")
+    footer_frame.grid(row=3, column=0, padx=20, pady=10, sticky="nsew")
     # footer_frame.grid_columnconfigure((0, 1), weight=1)
 
     label = ctk.CTkLabel(footer_frame, text="Max Income & Expense "+self.period, font=("Helvetica", 15)).grid(row=0, column=0, sticky="w")

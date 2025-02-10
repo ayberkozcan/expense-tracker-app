@@ -23,8 +23,11 @@ class ExpenseTracker(ctk.CTk):
         self.current_day = datetime.now().day
         self.current_month = datetime.now().month
         self.current_year = datetime.now().year
+        self.selected_year = datetime.now().year
 
         self.formatted_date = f"{self.current_year}-{str(self.current_month).zfill(2)}-{str(self.current_day).zfill(2)}"
+        self.formatted_year = f"{self.selected_year}-00-00"
+        self.formatted_next_year = f"{self.selected_year+1}-00-00"
 
         self.connect_database()
 
@@ -85,35 +88,32 @@ class ExpenseTracker(ctk.CTk):
         
 
         balances = [data[1] for data in balance]
-        print(self.current_month)
-        print(dates)
-        print(balances)
-        
+
         return dates, balances
     
     def get_balance_by_date(self, period):
-        time = self.period_to_date(period)
+        # time = self.period_to_date(period)
         balance = self.cursor.execute("""
             SELECT 
-                date, 
+                strftime('%Y-%m', date) AS month,
                 COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) -
                 COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) AS balance
             FROM transactions
-            WHERE date >= ?
-            GROUP BY date
-            ORDER BY date;
+            WHERE date >= ? AND date < ?
+            GROUP BY month
+            ORDER BY month;
             """
-        , (time,)).fetchall()
+        , (self.formatted_year, self.formatted_next_year)).fetchall()
 
-        dates = [datetime.strptime(data[0], '%Y-%m-%d').day for data in balance]
-        
+        months = [datetime.strptime(data[0], '%Y-%m').month for data in balance]
 
         balances = [data[1] for data in balance]
-        print(self.current_month)
-        print(dates)
+
+        print(months)
         print(balances)
-        
-        return dates, balances
+
+        return months, balances
+
     
     def get_latest_transactions(self, type, limit=3):
         transactions = self.cursor.execute("SELECT amount, category FROM transactions WHERE type = ? ORDER BY transaction_id DESC LIMIT ?", (type, limit)).fetchall()

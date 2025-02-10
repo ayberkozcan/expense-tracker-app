@@ -27,24 +27,28 @@ def reports_page(self):
     chart_frame.grid(row=0, column=0, sticky="w")
 
     net_balance = ctk.CTkLabel(self.content_frame, text=str(self.balance)+"$", text_color="yellow", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
-    if self.period != "This Month":
+    if self.period == "This Year":
         dates, balances = self.get_balance_by_date(self.period)
+        x = list(range(1, 13))
+
+        min_length = min(len(x), len(balances))
+        x = x[:min_length]
+        y = balances[:min_length]
     else:
         dates, balances = self.get_balance_by_month(self.period)
-
-    x = dates
-    y = balances
+        x = dates
+        y = balances
 
     fig, ax = plt.subplots(figsize=(5, 4))
     ax.plot(x, y, marker='o', linestyle='-', color='g')
-    ax.set_xlabel("Days")
+    ax.set_xlabel("Months" if self.period == "This Year" else "Days")
     ax.set_ylabel("Dollars")
     ax.grid(True)
 
     if self.period == "This Month":
         ax.set_title(f"Balance for {self.current_year}-{str(self.current_month).zfill(2)}", fontsize=11, fontweight="bold")
-    else:
-        ax.set_title(f"Balance", fontsize=11, fontweight="bold")
+    elif self.period == "This Year":
+        ax.set_title(f"Balance for {self.selected_year}", fontsize=11, fontweight="bold")
 
     fig.patch.set_alpha(0)
     ax.set_facecolor((0, 0, 0, 0))
@@ -58,6 +62,12 @@ def reports_page(self):
         left_arrow = ctk.CTkButton(chart_frame, text="<-", width=40, command=lambda: update_month(self, "back"))
         left_arrow.grid(row=2, column=3, sticky="w")
         right_arrow = ctk.CTkButton(chart_frame, text="->", width=40, command=lambda: update_month(self, "forward"))
+        right_arrow.grid(row=2, column=3, sticky="e")
+
+    if self.period == "This Year":
+        left_arrow = ctk.CTkButton(chart_frame, text="<-", width=40, command=lambda: update_year(self, "back"))
+        left_arrow.grid(row=2, column=3, sticky="w")
+        right_arrow = ctk.CTkButton(chart_frame, text="->", width=40, command=lambda: update_year(self, "forward"))
         right_arrow.grid(row=2, column=3, sticky="e")
 
     # Period Buttons
@@ -153,5 +163,16 @@ def update_month(self, operation):
             self.current_month += 1
 
     self.formatted_date = f"{self.current_year}-{str(self.current_month).zfill(2)}-{str(self.current_day).zfill(2)}"
+
+    reports_page(self)
+
+def update_year(self, operation):
+    if operation == "back":
+        self.selected_year -= 1
+    else:
+        self.selected_year += 1
+
+    self.formatted_year = f"{self.selected_year}-00-00"
+    self.formatted_next_year = f"{self.selected_year+1}-00-00"
 
     reports_page(self)

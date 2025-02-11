@@ -107,12 +107,16 @@ class ExpenseTracker(ctk.CTk):
 
         months = [datetime.strptime(data[0], '%Y-%m').month for data in balance]
 
-        balances = [data[1] for data in balance]
+        balances_per_month = [data[1] for data in balance]
+        total_balance = []
 
-        print(months)
-        print(balances)
+        for i, amount in enumerate(balances_per_month):
+            total_balance.append(amount)
+            total_balance[i] = sum(total_balance)
 
-        return months, balances
+        print(balances_per_month)
+        print(total_balance)
+        return months, total_balance
 
     
     def get_latest_transactions(self, type, limit=3):
@@ -169,13 +173,16 @@ class ExpenseTracker(ctk.CTk):
 
         return total_amount
     
-    def delete_transaction(self, id):
+    def delete_transaction(self, id, page):
         control = messagebox.askyesno("Delete Transaction", "Are you sure you want to delete this transaction?")
         if control:
             self.cursor.execute("DELETE FROM transactions WHERE transaction_id = ?", (id,))
             self.conn.commit()
             
-            incomes_page(self)
+            if page == "income":
+                incomes_page(self)
+            else:
+                expenses_page(self)
 
     def get_used_categories(self, type):
         categories = self.cursor.execute("SELECT category FROM transactions WHERE type = ?", (type,)).fetchall()

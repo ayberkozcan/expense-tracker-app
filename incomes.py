@@ -106,7 +106,7 @@ def incomes_page(self):
             details = ctk.CTkButton(records_by_categories_frame, text="Details", width=20)
             details.grid(row=i+2, column=1, sticky="")
             id = incomes[i][0]
-            delete = ctk.CTkButton(records_by_categories_frame, text="Delete", width=20, fg_color="red", hover_color="darkred", command=lambda id=id: self.delete_transaction(id))
+            delete = ctk.CTkButton(records_by_categories_frame, text="Delete", width=20, fg_color="red", hover_color="darkred", command=lambda id=id: self.delete_transaction(id, "income"))
             delete.grid(row=i+2, column=1, sticky="e")
 
     categories_selectBox = ctk.CTkOptionMenu(footer_frame, values=categories, variable=selected_category, command=update_records_by_category)

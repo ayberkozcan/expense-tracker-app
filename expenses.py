@@ -16,7 +16,7 @@ def expenses_page(self):
     net_expense = 0
     
     net_expense = self.get_total_amount_by_type("expense", self.period)
-    net_expense_label = ctk.CTkLabel(self.content_frame, text=str(net_expense)+"$", text_color="darkred", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
+    net_expense_label = ctk.CTkLabel(self.content_frame, text=str(net_expense)+self.currency, text_color="darkred", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
 
     # Top Frame
     top_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
@@ -82,7 +82,7 @@ def expenses_page(self):
     label = ctk.CTkLabel(summary_frame, text="Category").grid(row=1, column=1, pady=5, sticky="w")
     expenses = self.get_latest_transactions("expense", 6)
     for i, amount in enumerate(expenses):
-        label = ctk.CTkLabel(summary_frame, text=f"{expenses[i][0]} $").grid(row=i+2, column=0, pady=5, sticky="w")
+        label = ctk.CTkLabel(summary_frame, text=f"{expenses[i][0]} {self.currency}").grid(row=i+2, column=0, pady=5, sticky="w")
         category = ctk.CTkLabel(summary_frame, text=expenses[i][1]).grid(row=i+2, column=1, sticky="w")
         details = ctk.CTkButton(summary_frame, text="Details", width=20)
         details.grid(row=i+2, column=2, sticky="")
@@ -102,7 +102,7 @@ def expenses_page(self):
 
         expenses = self.get_latest_transactions_by_category("expense", selected, self.period, 10)
         for i, amount in enumerate(expenses):
-            label = ctk.CTkLabel(records_by_categories_frame, text=f"{expenses[i][1]} $").grid(row=i+2, column=0, pady=5, sticky="w")
+            label = ctk.CTkLabel(records_by_categories_frame, text=f"{expenses[i][1]} {self.currency}").grid(row=i+2, column=0, pady=5, sticky="w")
             details = ctk.CTkButton(records_by_categories_frame, text="Details", width=20)
             details.grid(row=i+2, column=1, sticky="")
             id = expenses[i][0]

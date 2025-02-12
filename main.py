@@ -208,17 +208,14 @@ class ExpenseTracker(ctk.CTk):
         today = datetime.today()
 
         if period == "This Week":
-            # start_of_week = today - timedelta(days=today.weekday())
             start_of_week = today - timedelta(days=7)
             return start_of_week.date().strftime("%Y-%m-%d")
 
         if period == "This Month":
-            # start_of_month = today.replace(day=1)
             start_of_month = today - timedelta(days=30)
             return start_of_month.date().strftime("%Y-%m-%d")
 
         if period == "This Year":
-            # start_of_year = today.replace(month=1, day=1)
             start_of_year = today - timedelta(days=365)
             return start_of_year.date().strftime("%Y-%m-%d")
 
@@ -296,7 +293,7 @@ class ExpenseTracker(ctk.CTk):
         
         self.clear_content_frame()
         
-        balance_label = ctk.CTkLabel(self.content_frame, text="Balance\n\n"+str(self.balance)+"$", font=("Helvetica", 25)).grid(row=0, column=0, columnspan=2)
+        balance_label = ctk.CTkLabel(self.content_frame, text="Balance\n\n"+str(self.balance)+self.currency, font=("Helvetica", 25)).grid(row=0, column=0, columnspan=2)
 
         # Incomes Frame
         incomes_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
@@ -329,7 +326,7 @@ class ExpenseTracker(ctk.CTk):
                 label = ctk.CTkLabel(incomes_frame, text="")
                 label.grid(row=i+2, column=0, sticky="w")
         for i, amount in enumerate(incomes):
-            label = ctk.CTkLabel(incomes_frame, text=f"{incomes[i][0]} $").grid(row=i+2, column=0)
+            label = ctk.CTkLabel(incomes_frame, text=f"{incomes[i][0]} {self.currency}").grid(row=i+2, column=0)
             category = ctk.CTkLabel(incomes_frame, text=incomes[i][1]).grid(row=i+2, column=1)
 
         label = ctk.CTkLabel(expenses_frame, text="Latest Expenses\n", font=("Helvetica", 20)).grid(row=0, column=0, columnspan=2)
@@ -348,7 +345,7 @@ class ExpenseTracker(ctk.CTk):
                 label = ctk.CTkLabel(expenses_frame, text="")
                 label.grid(row=i+2, column=0, sticky="w")
         for i, amount in enumerate(expenses):
-            label = ctk.CTkLabel(expenses_frame, text=f"{expenses[i][0]} $").grid(row=i+2, column=0)
+            label = ctk.CTkLabel(expenses_frame, text=f"{expenses[i][0]} {self.currency}").grid(row=i+2, column=0)
             category = ctk.CTkLabel(expenses_frame, text=expenses[i][1]).grid(row=i+2, column=1)
 
         fav_income_category = self.get_fav_category("income")
@@ -382,7 +379,7 @@ class ExpenseTracker(ctk.CTk):
         
         validate_command = (self.content_frame.register(self.validate_number), "%P")
 
-        amount_entry = ctk.CTkEntry(center_frame, placeholder_text="$", corner_radius=5, height=25, width=250, validate="key", validatecommand=validate_command)
+        amount_entry = ctk.CTkEntry(center_frame, placeholder_text=self.currency, corner_radius=5, height=25, width=250, validate="key", validatecommand=validate_command)
         amount_entry.grid(row=1, column=0, columnspan=2, sticky="w", pady=5)
 
         # Category field

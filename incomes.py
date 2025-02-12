@@ -16,7 +16,7 @@ def incomes_page(self):
     net_income = 0
     
     net_income = self.get_total_amount_by_type("income", self.period)
-    net_income_label = ctk.CTkLabel(self.content_frame, text=str(net_income)+"$", text_color="darkgreen", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
+    net_income_label = ctk.CTkLabel(self.content_frame, text=str(net_income)+self.currency, text_color="darkgreen", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
 
     # Top Frame
     top_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
@@ -82,7 +82,7 @@ def incomes_page(self):
     label = ctk.CTkLabel(summary_frame, text="Category").grid(row=1, column=1, pady=5, sticky="w")
     incomes = self.get_latest_transactions("income", 6)
     for i, amount in enumerate(incomes):
-        label = ctk.CTkLabel(summary_frame, text=f"{incomes[i][0]} $").grid(row=i+2, column=0, pady=5, sticky="w")
+        label = ctk.CTkLabel(summary_frame, text=f"{incomes[i][0]} {self.currency}").grid(row=i+2, column=0, pady=5, sticky="w")
         category = ctk.CTkLabel(summary_frame, text=incomes[i][1]).grid(row=i+2, column=1, sticky="w")
         details = ctk.CTkButton(summary_frame, text="Details", width=20)
         details.grid(row=i+2, column=2, sticky="")
@@ -102,7 +102,7 @@ def incomes_page(self):
 
         incomes = self.get_latest_transactions_by_category("income", selected, self.period, 10)
         for i, amount in enumerate(incomes):
-            label = ctk.CTkLabel(records_by_categories_frame, text=f"{incomes[i][1]} $").grid(row=i+2, column=0, pady=5, sticky="w")
+            label = ctk.CTkLabel(records_by_categories_frame, text=f"{incomes[i][1]} {self.currency}").grid(row=i+2, column=0, pady=5, sticky="w")
             details = ctk.CTkButton(records_by_categories_frame, text="Details", width=20)
             details.grid(row=i+2, column=1, sticky="")
             id = incomes[i][0]

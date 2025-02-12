@@ -26,7 +26,7 @@ def reports_page(self):
     chart_frame = ctk.CTkFrame(top_frame, fg_color="transparent")
     chart_frame.grid(row=0, column=0, sticky="w")
 
-    net_balance = ctk.CTkLabel(self.content_frame, text=str(self.balance)+"$", text_color="yellow", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
+    net_balance = ctk.CTkLabel(self.content_frame, text=str(self.balance)+self.currency, text_color="yellow", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
     
     dates, balances = self.get_balance_by_date(self.period)
     x = list(range(1, 13))
@@ -81,7 +81,7 @@ def reports_page(self):
     label = ctk.CTkLabel(summary_frame, text="Type").grid(row=1, column=2, pady=5, sticky="w")
     transactions = self.get_all_latest_transactions(9)
     for i, amount in enumerate(transactions):
-        label = ctk.CTkLabel(summary_frame, text=f"{transactions[i][0]} $").grid(row=i+2, column=0, pady=5, sticky="w")
+        label = ctk.CTkLabel(summary_frame, text=f"{transactions[i][0]} {self.currency}").grid(row=i+2, column=0, pady=5, sticky="w")
         category = ctk.CTkLabel(summary_frame, text=transactions[i][1]).grid(row=i+2, column=1, sticky="w")
         type = ctk.CTkLabel(summary_frame, text=transactions[i][2]).grid(row=i+2, column=2, sticky="w")
         details = ctk.CTkButton(summary_frame, text="Details", width=20)
@@ -112,10 +112,10 @@ def reports_page(self):
     records_by_categories_frame = ctk.CTkFrame(footer_frame, fg_color="transparent")
     records_by_categories_frame.grid(row=2, column=0, sticky="nsew")
 
-    max_income_label = ctk.CTkLabel(records_by_categories_frame, text="Max Income: "+str(max_income)+"$")
+    max_income_label = ctk.CTkLabel(records_by_categories_frame, text="Max Income: "+str(max_income)+self.currency)
     max_income_label.grid(row=0, column=0, sticky="w")
 
-    max_expense_label = ctk.CTkLabel(records_by_categories_frame, text="Max Expense: "+str(max_expense)+"$")
+    max_expense_label = ctk.CTkLabel(records_by_categories_frame, text="Max Expense: "+str(max_expense)+self.currency)
     max_expense_label.grid(row=1, column=0, sticky="w")
 
     # # Right Footer Frame

@@ -17,8 +17,8 @@ class ExpenseTracker(ctk.CTk):
 
         ctk.set_appearance_mode("dark-blue")
 
-        self.currencies = ["USD", "EUR", "JPY", "GBP", "AUD", "CAD", "CHF", "CNY", "SEK", "TRY"]
-        self.currency = "USD"
+        self.currencies = ["$", "€", "¥", "£", "A$", "C$", "CHF", "¥", "kr", "₺"]
+        self.currency = "$"
         self.period = "This Week"
         self.current_day = datetime.now().day
         self.current_month = datetime.now().month
@@ -72,27 +72,37 @@ class ExpenseTracker(ctk.CTk):
         return balance[0]
     
     def get_balance_by_month(self, period):
+        year, month = map(int, self.formatted_date[:7].split("-"))
+        if month == 12:
+            next_ym = f"{year + 1}-01"
+        else:
+            next_ym = f"{year}-{month+1:02d}"
+
         balance = self.cursor.execute("""
             SELECT 
-                date, 
+                strftime('%Y-%m-%d', date) AS day,
                 COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) -
                 COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) AS balance
             FROM transactions
-            WHERE strftime('%Y-%m', date) = ?
-            GROUP BY date
-            ORDER BY date;
+            WHERE date >= ? AND date < ?
+            GROUP BY day
+            ORDER BY day;
             """
-        , (self.formatted_date[:7],)).fetchall()
+        , (self.formatted_date[:7], next_ym)).fetchall()
 
-        dates = [datetime.strptime(data[0], '%Y-%m-%d').day for data in balance]
-        
+        days = [datetime.strptime(data[0], '%Y-%m-%d').day for data in balance]
 
-        balances = [data[1] for data in balance]
+        balances_per_day = [data[1] for data in balance]
+        print(balances_per_day)
+        total_balance = []
 
-        return dates, balances
+        for i, amount in enumerate(balances_per_day):
+            total_balance.append(amount)
+            total_balance[i] = sum(total_balance)
+
+        return days, total_balance
     
     def get_balance_by_date(self, period):
-        # time = self.period_to_date(period)
         balance = self.cursor.execute("""
             SELECT 
                 strftime('%Y-%m', date) AS month,
@@ -114,10 +124,7 @@ class ExpenseTracker(ctk.CTk):
             total_balance.append(amount)
             total_balance[i] = sum(total_balance)
 
-        print(balances_per_month)
-        print(total_balance)
         return months, total_balance
-
     
     def get_latest_transactions(self, type, limit=3):
         transactions = self.cursor.execute("SELECT amount, category FROM transactions WHERE type = ? ORDER BY transaction_id DESC LIMIT ?", (type, limit)).fetchall()

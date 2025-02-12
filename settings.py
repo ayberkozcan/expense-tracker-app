@@ -53,17 +53,17 @@ def settings_page(self):
     categories_button = ctk.CTkButton(self.content_frame, text="Manage Categories", height=40, command=lambda: manage_categories_screen(self))
     categories_button.grid(row=2, column=0, padx=20, columnspan=2, sticky="w")
 
-    # Languages Frame
-    languages_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
-    languages_frame.grid(row=3, column=0, padx=20, columnspan=2, sticky="nsew")
+    # # Languages Frame
+    # languages_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
+    # languages_frame.grid(row=3, column=0, padx=20, columnspan=2, sticky="nsew")
 
-    label = ctk.CTkLabel(languages_frame, text="Language", font=("Helvetica", 20))
-    label.grid(row=0, column=0, pady=10, sticky="w")
+    # label = ctk.CTkLabel(languages_frame, text="Language", font=("Helvetica", 20))
+    # label.grid(row=0, column=0, pady=10, sticky="w")
     
-    languages = ["English", "Turkish", "German", "Spanish"]
+    # languages = ["English", "Turkish", "German", "Spanish"]
 
-    for i, language in enumerate(languages):
-        button = ctk.CTkButton(languages_frame, text=language, fg_color="transparent", hover=None, font=("Helvetica", 14))
+    # for i, language in enumerate(languages):
+    #     button = ctk.CTkButton(languages_frame, text=language, fg_color="transparent", hover=None, font=("Helvetica", 14))
         # button.grid(row=1, column=i, sticky="w")
 
     # Delete Data

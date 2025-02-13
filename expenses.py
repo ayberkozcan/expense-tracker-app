@@ -16,7 +16,7 @@ def expenses_page(self):
     net_expense = 0
     
     net_expense = self.get_total_amount_by_type("expense", self.period)
-    net_expense_label = ctk.CTkLabel(self.content_frame, text=str(net_expense)+self.currency, text_color="darkred", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
+    net_expense_label = ctk.CTkLabel(self.content_frame, text=f"{str(net_expense)} {self.currency}", text_color="darkred", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
 
     # Top Frame
     top_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
@@ -131,7 +131,7 @@ def expenses_page(self):
 
     for i, category in enumerate(categories, start=1):  
         total_amount = self.get_total_amount_by_categories("expense", category, self.period)
-        text = "No data..." if not total_amount else total_amount
+        text = "No data..." if not total_amount else f"{str(total_amount)} {self.currency}"
         label = ctk.CTkLabel(expense_by_categories_frame, text=category).grid(row=i+1, column=0, pady=5, sticky="w")
         label = ctk.CTkLabel(expense_by_categories_frame, text=text).grid(row=i+1, column=1, pady=5, sticky="w")
 

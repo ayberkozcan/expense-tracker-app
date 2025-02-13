@@ -1,3 +1,4 @@
+import json
 import customtkinter as ctk
 from tkinter import messagebox
 
@@ -34,7 +35,7 @@ def settings_page(self):
     ]
 
     for i, theme in enumerate(themes):
-        button = ctk.CTkButton(theme_color_frame, text=theme["text"], width=50, height=40, corner_radius=10, font=("Helvetica", 14), command=lambda theme=theme: set_theme(theme["theme"]))
+        button = ctk.CTkButton(theme_color_frame, text=theme["text"], width=50, height=40, corner_radius=10, font=("Helvetica", 14), command=lambda theme=theme: set_theme(self, theme["theme"]))
         button.grid(row=1, column=i, padx=(0, 10), sticky="nsew")
     
     label = ctk.CTkLabel(theme_color_frame, text="Color", font=("Helvetica", 20))
@@ -52,19 +53,6 @@ def settings_page(self):
     
     categories_button = ctk.CTkButton(self.content_frame, text="Manage Categories", height=40, command=lambda: manage_categories_screen(self))
     categories_button.grid(row=2, column=0, padx=20, columnspan=2, sticky="w")
-
-    # # Languages Frame
-    # languages_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
-    # languages_frame.grid(row=3, column=0, padx=20, columnspan=2, sticky="nsew")
-
-    # label = ctk.CTkLabel(languages_frame, text="Language", font=("Helvetica", 20))
-    # label.grid(row=0, column=0, pady=10, sticky="w")
-    
-    # languages = ["English", "Turkish", "German", "Spanish"]
-
-    # for i, language in enumerate(languages):
-    #     button = ctk.CTkButton(languages_frame, text=language, fg_color="transparent", hover=None, font=("Helvetica", 14))
-        # button.grid(row=1, column=i, sticky="w")
 
     # Delete Data
     delete_data = ctk.CTkButton(
@@ -84,27 +72,47 @@ def change_currency(self, temp_currency):
         f"Are you sure you want to change currency to {temp_currency}?"
     )
     if response:
-        self.currency = temp_currency
+        # self.currency = temp_currency
         messagebox.showinfo(
             "Success",
             "Currency changed successfully!"
         )
+        
+        settings = self.load_settings()
+        settings["currency"] = temp_currency
+
+        with open("data/settings.json", "w") as file:
+            json.dump(settings, file, indent=4)
+        
+        self.currency = temp_currency
+
         settings_page(self)
 
     settings_page(self)
 
     # Save to file
 
-def set_theme(theme):
+def set_theme(self, theme):
     ctk.set_appearance_mode(theme)
 
+    settings = self.load_settings()
+    settings["theme"] = theme
+
+    with open("data/settings.json", "w") as file:
+        json.dump(settings, file, indent=4)
+        
     # Save to file
 
 def set_color(self, color):
     ctk.set_default_color_theme(color)
+    
+    settings = self.load_settings()
+    settings["color"] = color
+
+    with open("data/settings.json", "w") as file:
+        json.dump(settings, file, indent=4)
 
     settings_page(self)
-
     # Save to file
 
 def create_category_frame(self, category_type, categories, row, column):
@@ -114,13 +122,10 @@ def create_category_frame(self, category_type, categories, row, column):
     category_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
     category_frame.grid(row=row + 1, column=column, padx=40, pady=20, sticky="nsew")
     category_frame.grid_columnconfigure(0, weight=8)
-    category_frame.grid_columnconfigure(1, weight=1)
-    category_frame.grid_columnconfigure(2, weight=1)
+    category_frame.grid_columnconfigure((1, 2), weight=1)
 
     if not categories:
-        category_frame.grid_columnconfigure(0, weight=1)
-        category_frame.grid_columnconfigure(1, weight=1)
-        category_frame.grid_columnconfigure(2, weight=1)
+        category_frame.grid_columnconfigure((0, 1, 2), weight=1)
         label = ctk.CTkLabel(category_frame, text="No data found", font=("Helvetica", 15))
         label.grid(row=0, column=1, pady=10, sticky="")
         
@@ -160,9 +165,7 @@ def edit_category(self, old_name):
     self.edit_category_screen.geometry("250x200")
     self.edit_category_screen.title("Edit Category")
 
-    self.edit_category_screen.grid_rowconfigure(0, weight=1)
-    self.edit_category_screen.grid_rowconfigure(1, weight=1)
-    self.edit_category_screen.grid_rowconfigure(2, weight=1)
+    self.edit_category_screen.grid_rowconfigure((0, 1, 2), weight=1)
     self.edit_category_screen.grid_columnconfigure(0, weight=1)
 
     label = ctk.CTkLabel(self.edit_category_screen, text="Rename", font=("Helvetica", 15)).grid(row=0, column=0)
@@ -205,9 +208,7 @@ def add_category(self, category_type):
     self.add_category_screen.geometry("250x200")
     self.add_category_screen.title("Add Category")
 
-    self.add_category_screen.grid_rowconfigure(0, weight=1)
-    self.add_category_screen.grid_rowconfigure(1, weight=1)
-    self.add_category_screen.grid_rowconfigure(2, weight=1)
+    self.add_category_screen.grid_rowconfigure((0, 1, 2), weight=1)
     self.add_category_screen.grid_columnconfigure(0, weight=1)
 
     label = ctk.CTkLabel(self.add_category_screen, text="Category Name", font=("Helvetica", 15)).grid(row=0, column=0)

@@ -16,7 +16,7 @@ def incomes_page(self):
     net_income = 0
     
     net_income = self.get_total_amount_by_type("income", self.period)
-    net_income_label = ctk.CTkLabel(self.content_frame, text=str(net_income)+self.currency, text_color="darkgreen", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
+    net_income_label = ctk.CTkLabel(self.content_frame, text=f"{str(net_income)} {self.currency}", text_color="darkgreen", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
 
     # Top Frame
     top_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
@@ -131,7 +131,7 @@ def incomes_page(self):
 
     for i, category in enumerate(categories, start=1):  
         total_amount = self.get_total_amount_by_categories("income", category, self.period)
-        text = "No data..." if not total_amount else total_amount
+        text = "No data..." if not total_amount else f"{str(total_amount)} {self.currency}"
         label = ctk.CTkLabel(income_by_categories_frame, text=category).grid(row=i+1, column=0, pady=5, sticky="w")
         label = ctk.CTkLabel(income_by_categories_frame, text=text).grid(row=i+1, column=1, pady=5, sticky="w")
 

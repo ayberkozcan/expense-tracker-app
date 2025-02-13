@@ -7,6 +7,7 @@ import sqlite3
 from tkcalendar import Calendar
 from tkinter import messagebox
 from datetime import datetime, timedelta
+import json
 
 class ExpenseTracker(ctk.CTk):
     def __init__(self):
@@ -18,7 +19,16 @@ class ExpenseTracker(ctk.CTk):
         ctk.set_appearance_mode("dark-blue")
 
         self.currencies = ["$", "€", "¥", "£", "A$", "C$", "CHF", "¥", "kr", "₺"]
-        self.currency = "$"
+        
+        settings = self.load_settings()
+        self.theme = settings.get("theme")
+        self.color = settings.get("color")
+        self.currency = settings.get("currency")
+
+        ctk.set_appearance_mode(self.theme)
+        ctk.set_default_color_theme(self.color)
+
+        # self.currency = "$"
         self.period = "This Week"
         self.current_day = datetime.now().day
         self.current_month = datetime.now().month
@@ -36,6 +46,13 @@ class ExpenseTracker(ctk.CTk):
         self.balance = self.get_balance()
 
         self.dashboard_page()
+
+    def load_settings(self):
+        try:
+            with open("data/settings.json", "r") as file:
+                return json.load(file)
+        except FileNotFoundError:
+            return {"theme": "dark", "color": "dark-blue", "currency": "$"}
 
     def connect_database(self):
         self.conn = sqlite3.connect("data/database/categories.db")
@@ -263,8 +280,7 @@ class ExpenseTracker(ctk.CTk):
         self.content_frame.grid_rowconfigure(1, weight=5)
         self.content_frame.grid_rowconfigure(2, weight=1)
         self.content_frame.grid_rowconfigure(3, weight=3)
-        self.content_frame.grid_columnconfigure(0, weight=1)
-        self.content_frame.grid_columnconfigure(1, weight=1)
+        self.content_frame.grid_columnconfigure((0, 1), weight=1)
 
         self.header = ctk.CTkLabel(self.header_frame, text="Dashboard", font=("Helvetica", 25))
         self.header.grid(row=0, column=0, padx=20, pady=20)
@@ -293,15 +309,14 @@ class ExpenseTracker(ctk.CTk):
         
         self.clear_content_frame()
         
-        balance_label = ctk.CTkLabel(self.content_frame, text="Balance\n\n"+str(self.balance)+self.currency, font=("Helvetica", 25)).grid(row=0, column=0, columnspan=2)
+        balance_label = ctk.CTkLabel(self.content_frame, text=f"Balance\n\n{str(self.balance)} {self.currency}", font=("Helvetica", 25)).grid(row=0, column=0, columnspan=2)
 
         # Incomes Frame
         incomes_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
         incomes_frame.grid(row=1, column=0, sticky="we")
         incomes_frame.grid_rowconfigure(0, weight=1)
         incomes_frame.grid_rowconfigure(1, weight=9)
-        incomes_frame.grid_columnconfigure(0, weight=1)
-        incomes_frame.grid_columnconfigure(1, weight=1)
+        incomes_frame.grid_columnconfigure((0, 1), weight=1)
 
         # Expenses Frame
         expenses_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")

@@ -26,7 +26,7 @@ def reports_page(self):
     chart_frame = ctk.CTkFrame(top_frame, fg_color="transparent")
     chart_frame.grid(row=0, column=0, sticky="w")
 
-    net_balance = ctk.CTkLabel(self.content_frame, text=str(self.balance)+self.currency, text_color="yellow", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
+    net_balance = ctk.CTkLabel(self.content_frame, text=f"{str(self.balance)} {self.currency}", text_color="yellow", font=("Helvetica", 30)).grid(row=0, column=0, columnspan=2, pady=20)
     
     dates, balances = self.get_balance_by_date(self.period)
     x = list(range(1, 13))
@@ -38,7 +38,7 @@ def reports_page(self):
     fig, ax = plt.subplots(figsize=(5, 4))
     ax.plot(x, y, marker='o', linestyle='-', color='g')
     ax.set_xlabel("Months")
-    ax.set_ylabel("Dollars")
+    ax.set_ylabel(self.currency, rotation=0)
     ax.grid(True)
     ax.set_title(f"Balance for {self.selected_year}", fontsize=11, fontweight="bold")
 
@@ -90,20 +90,8 @@ def reports_page(self):
     # Footer Frame
     footer_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
     footer_frame.grid(row=3, column=0, padx=20, pady=10, sticky="nsew")
-    # footer_frame.grid_columnconfigure((0, 1), weight=1)
 
     label = ctk.CTkLabel(footer_frame, text="Max Income & Expense "+self.period, font=("Helvetica", 15)).grid(row=0, column=0, sticky="w")
-
-    # label = ctk.CTkLabel(footer_frame, text="Max Income & Expense by Categories "+self.period, font=("Helvetica", 15)).grid(row=0, column=1, sticky="w")
-
-    # categories = ["All Categories", "Housing", "Food", "Transportation", "Healthcare", "Entertainment"]
-    
-    # selected_category = ctk.StringVar(value=categories[0])
-
-    
-    
-    # categories_selectBox = ctk.CTkOptionMenu(footer_frame, values=categories, variable=selected_category)
-    # categories_selectBox.grid(row=1, column=1, pady=15, sticky="w")
 
     max_income = self.get_max_by_date(self.period, "income")
     max_expense = self.get_max_by_date(self.period, "expense")
@@ -112,21 +100,11 @@ def reports_page(self):
     records_by_categories_frame = ctk.CTkFrame(footer_frame, fg_color="transparent")
     records_by_categories_frame.grid(row=2, column=0, sticky="nsew")
 
-    max_income_label = ctk.CTkLabel(records_by_categories_frame, text="Max Income: "+str(max_income)+self.currency)
+    max_income_label = ctk.CTkLabel(records_by_categories_frame, text=f"Max Income: {str(max_income)} {self.currency}")
     max_income_label.grid(row=0, column=0, sticky="w")
 
-    max_expense_label = ctk.CTkLabel(records_by_categories_frame, text="Max Expense: "+str(max_expense)+self.currency)
+    max_expense_label = ctk.CTkLabel(records_by_categories_frame, text=f"Max Expense: {str(max_expense)} {self.currency}")
     max_expense_label.grid(row=1, column=0, sticky="w")
-
-    # # Right Footer Frame
-    # expense_by_categories_frame = ctk.CTkFrame(footer_frame, fg_color="transparent")
-    # expense_by_categories_frame.grid(row=2, column=1, sticky="nsew")
-
-    # max_income_label = ctk.CTkLabel(expense_by_categories_frame, text="Max Income: "+"$")
-    # max_income_label.grid(row=0, column=0, sticky="w")
-
-    # max_expense_label = ctk.CTkLabel(expense_by_categories_frame, text="Max Expense: "+"$")
-    # max_expense_label.grid(row=1, column=0, sticky="w")
 
 def update_period(self, period):
     self.period = period

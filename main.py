@@ -1,13 +1,16 @@
+import os
+import json
+import sqlite3
+from datetime import datetime, timedelta
+from tkinter import PhotoImage, messagebox
+
 import customtkinter as ctk
+from tkcalendar import Calendar
+
 from incomes import incomes_page
 from expenses import expenses_page
 from reports import reports_page
 from settings import settings_page
-import sqlite3
-from tkcalendar import Calendar
-from tkinter import messagebox
-from datetime import datetime, timedelta
-import json
 
 class ExpenseTracker(ctk.CTk):
     def __init__(self):
@@ -38,6 +41,14 @@ class ExpenseTracker(ctk.CTk):
         self.formatted_date = f"{self.current_year}-{str(self.current_month).zfill(2)}-{str(self.current_day).zfill(2)}"
         self.formatted_year = f"{self.selected_year}-00-00"
         self.formatted_next_year = f"{self.selected_year+1}-00-00"
+
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+        self.homepage_icon_path = os.path.join(BASE_DIR, "icons/homepage_icon.png")
+        self.dollar_icon_path = os.path.join(BASE_DIR, "icons/dollar_icon.png")
+        self.reports_icon_path = os.path.join(BASE_DIR, "icons/stats_icon.png")
+        self.settings_icon_path = os.path.join(BASE_DIR, "icons/settings_icon.png")
+        self.exit_icon_path = os.path.join(BASE_DIR, "icons/exit_icon.png")
 
         self.connect_database()
 
@@ -289,23 +300,92 @@ class ExpenseTracker(ctk.CTk):
         header.grid(row=0, column=0, padx=20, pady=20)
 
         # Menu Frame Buttons
-        dashboard_button = ctk.CTkButton(self.menu_frame, text="Dashboard", font=("Helvetica", 20), fg_color="transparent", hover_color="#00690c", command=self.dashboard_page)
-        dashboard_button.grid(row=1, column=0, padx=0, pady=30)
+        self.homepage_icon = PhotoImage(file=self.homepage_icon_path)
+        self.homepage_icon = self.homepage_icon.subsample(15, 15)
 
-        incomes_button = ctk.CTkButton(self.menu_frame, text="Incomes", font=("Helvetica", 20), fg_color="transparent", hover_color="#00690c", command=lambda: incomes_page(self))
-        incomes_button.grid(row=2, column=0, padx=0, pady=30)
+        self.dollar_icon = PhotoImage(file=self.dollar_icon_path)
+        self.dollar_icon = self.dollar_icon.subsample(15, 15)
 
-        expenses_button = ctk.CTkButton(self.menu_frame, text="Expenses", font=("Helvetica", 20), fg_color="transparent", hover_color="#00690c", command=lambda: expenses_page(self))
-        expenses_button.grid(row=3, column=0, padx=0, pady=30)
+        self.reports_icon = PhotoImage(file=self.reports_icon_path)
+        self.reports_icon = self.reports_icon.subsample(15, 15)
 
-        reports_button = ctk.CTkButton(self.menu_frame, text="Reports", font=("Helvetica", 20), fg_color="transparent", hover_color="#00690c", command=lambda: reports_page(self))
-        reports_button.grid(row=4, column=0, padx=0, pady=30)
+        self.settings_icon = PhotoImage(file=self.settings_icon_path)
+        self.settings_icon = self.settings_icon.subsample(15, 15)
 
-        settings_button = ctk.CTkButton(self.menu_frame, text="Settings", font=("Helvetica", 20), fg_color="transparent", hover_color="#00690c", command=lambda: settings_page(self))
-        settings_button.grid(row=5, column=0, padx=0, pady=30)
+        self.exit_icon = PhotoImage(file=self.exit_icon_path)
+        self.exit_icon = self.exit_icon.subsample(15, 15)
 
-        exit_button = ctk.CTkButton(self.menu_frame, text="Exit", font=("Helvetica", 20), fg_color="transparent", hover_color="#00690c", command=self.exit)
-        exit_button.grid(row=6, column=0, padx=0, pady=30)
+        dashboard_button = ctk.CTkButton(
+            self.menu_frame, 
+            text="Dashboard", 
+            font=("Helvetica", 20), 
+            fg_color="transparent", 
+            hover_color="#00690c", 
+            command=self.dashboard_page,
+            image=self.homepage_icon,
+            compound="left"
+        )
+        dashboard_button.grid(row=1, column=0, padx=0, pady=30, sticky="w")
+
+        incomes_button = ctk.CTkButton(
+            self.menu_frame, 
+            text="Incomes", 
+            font=("Helvetica", 20), 
+            fg_color="transparent",  
+            hover_color="#005f00",  
+            command=lambda: incomes_page(self),
+            image=self.dollar_icon,
+            compound="left"
+        )
+        incomes_button.grid(row=2, column=0, padx=0, pady=30, sticky="w")
+
+        expenses_button = ctk.CTkButton(
+            self.menu_frame, 
+            text="Expenses", 
+            font=("Helvetica", 20), 
+            fg_color="transparent",  
+            hover_color="#8b0000",  
+            command=lambda: expenses_page(self),
+            image=self.dollar_icon,
+            compound="left"
+        )
+        expenses_button.grid(row=3, column=0, padx=0, pady=30, sticky="w")
+
+        reports_button = ctk.CTkButton(
+            self.menu_frame, 
+            text="Reports", 
+            font=("Helvetica", 20), 
+            fg_color="transparent", 
+            hover_color="#00690c", 
+            command=lambda: reports_page(self),
+            image=self.reports_icon,
+            compound="left"
+        )
+        reports_button.grid(row=4, column=0, padx=0, pady=30, sticky="w")
+
+        settings_button = ctk.CTkButton(
+            self.menu_frame, 
+            text="Settings", 
+            font=("Helvetica", 20), 
+            fg_color="transparent", 
+            hover_color="#00690c", 
+            command=lambda: settings_page(self),
+            image=self.settings_icon,
+            compound="left"
+        )
+        settings_button.grid(row=5, column=0, padx=0, pady=30, sticky="w")
+
+        exit_button = ctk.CTkButton(
+            self.menu_frame, 
+            text="Exit", 
+            font=("Helvetica", 20), 
+            fg_color="transparent", 
+            hover_color="#8b0000",  
+            command=self.exit,
+            image=self.exit_icon,
+            compound="left"
+        )
+        exit_button.grid(row=6, column=0, padx=0, pady=30, sticky="w")
         
         self.clear_content_frame()
         

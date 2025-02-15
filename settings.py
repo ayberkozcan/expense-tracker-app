@@ -62,7 +62,8 @@ def settings_page(self):
         hover_color="darkred", 
         height=40,
         font=("Helvetica", 20),
-        corner_radius=10
+        corner_radius=10,
+        command=lambda: delete_all_data(self)
     )
     delete_data.grid(row=4, column=0, padx=20, pady=(10, 20), sticky="w")
 
@@ -72,7 +73,6 @@ def change_currency(self, temp_currency):
         f"Are you sure you want to change currency to {temp_currency}?"
     )
     if response:
-        # self.currency = temp_currency
         messagebox.showinfo(
             "Success",
             "Currency changed successfully!"
@@ -90,8 +90,6 @@ def change_currency(self, temp_currency):
 
     settings_page(self)
 
-    # Save to file
-
 def set_theme(self, theme):
     ctk.set_appearance_mode(theme)
 
@@ -100,8 +98,6 @@ def set_theme(self, theme):
 
     with open("data/settings.json", "w") as file:
         json.dump(settings, file, indent=4)
-        
-    # Save to file
 
 def set_color(self, color):
     ctk.set_default_color_theme(color)
@@ -113,7 +109,6 @@ def set_color(self, color):
         json.dump(settings, file, indent=4)
 
     settings_page(self)
-    # Save to file
 
 def create_category_frame(self, category_type, categories, row, column):
     category_label = ctk.CTkLabel(self.content_frame, text=f"{category_type}\nCategories", font=("Helvetica", 25))
@@ -247,3 +242,15 @@ def edit_category_db(self, new_name, old_name):
 
         self.edit_category_screen.destroy()
         manage_categories_screen(self)
+
+def delete_all_data(self):
+    response = messagebox.askyesno(
+        "Delete All Data", 
+        "Are you sure you want to delete all data?\n\nThis action cannot be undone\n(Categories remain)")
+    if response:
+        try:
+            self.cursor.execute("DELETE * FROM transactions")
+            self.conn.commit()
+            messagebox.showinfo("Succes", "All data deleted successfully!")
+        except:
+            print("Error!")

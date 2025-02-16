@@ -121,7 +121,6 @@ class ExpenseTracker(ctk.CTk):
         days = [datetime.strptime(data[0], '%Y-%m-%d').day for data in balance]
 
         balances_per_day = [data[1] for data in balance]
-        print(balances_per_day)
         total_balance = []
 
         for i, amount in enumerate(balances_per_day):
@@ -155,12 +154,12 @@ class ExpenseTracker(ctk.CTk):
         return months, total_balance
     
     def get_latest_transactions(self, type, limit=3):
-        transactions = self.cursor.execute("SELECT amount, category FROM transactions WHERE type = ? ORDER BY transaction_id DESC LIMIT ?", (type, limit)).fetchall()
+        transactions = self.cursor.execute("SELECT amount, category, transaction_id FROM transactions WHERE type = ? ORDER BY transaction_id DESC LIMIT ?", (type, limit)).fetchall()
         
         return transactions
     
     def get_all_latest_transactions(self, limit=3):
-        transactions = self.cursor.execute("SELECT amount, category, type FROM transactions ORDER BY date DESC LIMIT ?", (str(limit))).fetchall()
+        transactions = self.cursor.execute("SELECT amount, category, type, transaction_id FROM transactions ORDER BY date DESC LIMIT ?", (str(limit))).fetchall()
 
         return transactions
 
@@ -185,7 +184,7 @@ class ExpenseTracker(ctk.CTk):
             
             return fav_category
         except:
-            print("no fav cateory data")
+            print("no fav category data")
 
     def get_total_amount_by_type(self, type, period):
         time = self.period_to_date(period)
@@ -232,6 +231,11 @@ class ExpenseTracker(ctk.CTk):
 
         return max_amount 
     
+    def get_transaction_details(self, id):
+        details = self.cursor.execute("SELECT amount, date, category, type, note FROM transactions WHERE transaction_id = ?", (id,)).fetchall()[0]
+
+        return details
+    
     def period_to_date(self, period):
         today = datetime.today()
 
@@ -258,6 +262,9 @@ class ExpenseTracker(ctk.CTk):
             widget.grid_forget()
 
     def dashboard_page(self):
+        if hasattr(self, "details_window") and self.details_window.winfo_exists():
+            self.details_window.destroy()
+
         for widget in self.winfo_children():
             widget.grid_forget()
 
@@ -552,6 +559,39 @@ class ExpenseTracker(ctk.CTk):
 
         messagebox.showinfo("Success", "Transaction successful!")
         self.dashboard_page()
+
+    # This functions runs on Incomes, Expenses and Reports screens
+    def show_details_window(self, id):
+        details = self.get_transaction_details(id)
+
+        if hasattr(self, "details_window") and self.details_window.winfo_exists():
+            self.details_window.destroy()
+
+        self.details_window = ctk.CTkToplevel(self)
+        self.details_window.title("Details")
+        self.details_window.geometry("300x400")
+
+        for i in range(6):
+            self.details_window.grid_rowconfigure(i, weight=1)
+        self.details_window.grid_columnconfigure(0, weight=1)
+        self.details_window.grid_columnconfigure(1, weight=9)
+
+        labels = ["Amount", "Date", "Category", "Type", "Note"]
+        for i, text in enumerate(labels):
+            ctk.CTkLabel(self.details_window, text=text).grid(row=i, column=0, padx=20, sticky="w")
+        
+        for i, text in enumerate(details):
+            text="No data..." if not details[4] and i==4 else text
+            ctk.CTkLabel(self.details_window, text=text).grid(row=i, column=1, padx=20, sticky="w")
+
+        button = ctk.CTkButton(
+            self.details_window, 
+            text="Delete Transaction", 
+            fg_color="red", 
+            hover_color="darkred", 
+            corner_radius=20
+            )
+        button.grid(row=i+1, column=0, columnspan=2, padx=20, pady=20, sticky="nsew")
 
     def exit(self):
         self.destroy()

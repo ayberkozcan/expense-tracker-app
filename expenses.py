@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 def expenses_page(self):
+    if hasattr(self, "details_window") and self.details_window.winfo_exists():
+        self.details_window.destroy()
+        
     self.clear_content_frame()
     self.header.configure(text="Expenses")
 
@@ -84,7 +87,7 @@ def expenses_page(self):
     for i, amount in enumerate(expenses):
         label = ctk.CTkLabel(summary_frame, text=f"{expenses[i][0]} {self.currency}").grid(row=i+2, column=0, pady=5, sticky="w")
         category = ctk.CTkLabel(summary_frame, text=expenses[i][1]).grid(row=i+2, column=1, sticky="w")
-        details = ctk.CTkButton(summary_frame, text="Details", width=20)
+        details = ctk.CTkButton(summary_frame, text="Details", width=20, command=lambda i=i: self.show_details_window(expenses[i][2]))
         details.grid(row=i+2, column=2, sticky="")
 
     # Footer Frame
@@ -103,7 +106,7 @@ def expenses_page(self):
         expenses = self.get_latest_transactions_by_category("expense", selected, self.period, 10)
         for i, amount in enumerate(expenses):
             label = ctk.CTkLabel(records_by_categories_frame, text=f"{expenses[i][1]} {self.currency}").grid(row=i+2, column=0, pady=5, sticky="w")
-            details = ctk.CTkButton(records_by_categories_frame, text="Details", width=20)
+            details = ctk.CTkButton(records_by_categories_frame, text="Details", width=20, command=lambda i=i: self.show_details_window(expenses[i][0]))
             details.grid(row=i+2, column=1, sticky="")
             id = expenses[i][0]
             delete = ctk.CTkButton(records_by_categories_frame, text="Delete", width=20, fg_color="red", hover_color="darkred", command=lambda id=id: self.delete_transaction(id, "expense"))

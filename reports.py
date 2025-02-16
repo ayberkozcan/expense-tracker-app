@@ -5,6 +5,9 @@ from datetime import datetime
 import calendar
 
 def reports_page(self):
+    if hasattr(self, "details_window") and self.details_window.winfo_exists():
+        self.details_window.destroy()
+        
     self.clear_content_frame()
     self.header.configure(text="Reports")
     
@@ -84,7 +87,7 @@ def reports_page(self):
         label = ctk.CTkLabel(summary_frame, text=f"{transactions[i][0]} {self.currency}").grid(row=i+2, column=0, pady=5, sticky="w")
         category = ctk.CTkLabel(summary_frame, text=transactions[i][1]).grid(row=i+2, column=1, sticky="w")
         type = ctk.CTkLabel(summary_frame, text=transactions[i][2]).grid(row=i+2, column=2, sticky="w")
-        details = ctk.CTkButton(summary_frame, text="Details", width=20)
+        details = ctk.CTkButton(summary_frame, text="Details", width=20, command=lambda i=i: self.show_details_window(transactions[i][3]))
         details.grid(row=i+2, column=3, sticky="")
 
     # Footer Frame

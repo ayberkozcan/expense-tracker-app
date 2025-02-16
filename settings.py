@@ -3,6 +3,8 @@ import customtkinter as ctk
 from tkinter import messagebox
 
 def settings_page(self):
+    if hasattr(self, "details_window") and self.details_window.winfo_exists():
+        self.details_window.destroy()
     
     self.clear_content_frame()
     self.header.configure(text="Settings")

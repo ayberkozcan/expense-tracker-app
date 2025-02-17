@@ -2,7 +2,7 @@
 
 ## Overview
 
-Expense Tracker is a simple application that helps users track their daily expenses, categorize spending, and manage their budget efficiently.
+The Expense Tracker is a simple application designed to help users manage their personal finances by tracking their income and expenses. Users can add, edit, and delete transactions while viewing a summary of their financial activities.
 
 ### Features
 
@@ -11,3 +11,12 @@ Expense Tracker is a simple application that helps users track their daily expen
 * View total spending for a selected period
 * Simple and user-friendly interface
 * Export expense data for further analysis
+
+## Technologies Used
+
+* Programming Language: Python
+* Database: SQLite
+
+# Note
+
+All icons in this repository are taken from and belong to the site https://uxwing.com

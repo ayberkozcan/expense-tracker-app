@@ -12,11 +12,11 @@ The Expense Tracker is a simple application designed to help users manage their 
 * Simple and user-friendly interface
 * Export expense data for further analysis
 
-## Technologies Used
+### Technologies Used
 
 * Programming Language: Python
 * Database: SQLite
 
-# Note
+## Note
 
 All icons in this repository are taken from and belong to the site https://uxwing.com
